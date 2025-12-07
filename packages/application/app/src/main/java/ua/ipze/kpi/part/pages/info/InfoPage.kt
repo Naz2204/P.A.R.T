@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.os.LocaleListCompat
-import pixelBorder
 import ua.ipze.kpi.part.router.StartPageData
 import ua.ipze.kpi.part.R
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
+import ua.ipze.kpi.part.ui.theme.pixelBorder
 import java.util.Locale
 
 

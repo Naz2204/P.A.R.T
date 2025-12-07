@@ -42,7 +42,7 @@ fun GeneralButton(resourceId: Int, margin: Dp = 0.dp, modifier: Modifier = Modif
  * @param resourceId Id of the text from resources to be placed inside button
  * @param start, [top], [end] and [bottom] Apply margin along each edge of the content in [Dp]
  * @param onClick Function to be executed after button clicked
-*  @param image Switches button mode between text and image
+ * @param image Switches button mode between text and image
  */
 @Composable
 fun GeneralButton(resourceId: Int, start: Dp = 0.dp, top: Dp = 0.dp, end: Dp = 0.dp,
