@@ -15,38 +15,14 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Creates button with custom border
- * @param resourceId Id of the text from resources to be placed inside button
- * @param margin Margin of the button. Achieved by placing padding on outer box of the button. Calculated in [Dp]
- * @param onClick Function to be executed after button clicked
- * @param image Switches button mode between text and image
- */
-@Composable
-fun GeneralButton(resourceId: Int, margin: Dp = 0.dp, modifier: Modifier = Modifier, onClick:() -> Unit, image: Boolean = false) {
-    Box(
-        modifier = Modifier
-            .padding(margin)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        if (image) {
-            Image(painterResource(resourceId), null, modifier = modifier)
-        }
-        else {
-            Text(text = stringResource(resourceId), modifier = modifier)
-        }
-    }
-}
-
-/**
- * Creates button with custom border
- * @param resourceId Id of the text from resources to be placed inside button
+ * @param resourceId id of the text from resources to be placed inside button
  * @param start, [top], [end] and [bottom] Apply margin along each edge of the content in [Dp]
  * @param onClick Function to be executed after button clicked
  * @param image Switches button mode between text and image
  */
 @Composable
-fun GeneralButton(resourceId: Int, start: Dp = 0.dp, top: Dp = 0.dp, end: Dp = 0.dp,
-                bottom: Dp = 0.dp, modifier: Modifier = Modifier, onClick:() -> Unit, image: Boolean = false) {
+fun GeneralButton(modifier: Modifier = Modifier, resourceId: Int, start: Dp = 0.dp, top: Dp = 0.dp, end: Dp = 0.dp,
+                bottom: Dp = 0.dp, onClick:() -> Unit, image: Boolean = false) {
     Box(
         modifier = Modifier
             .padding(start, top, end, bottom)
@@ -60,4 +36,26 @@ fun GeneralButton(resourceId: Int, start: Dp = 0.dp, top: Dp = 0.dp, end: Dp = 0
             Text(text = stringResource(resourceId), modifier = modifier)
         }
     }
+}
+
+
+/**
+ * Creates button with custom border
+ * @param resourceId id of the text from resources to be placed inside button
+ * @param margin Margin of the button. Achieved by placing padding on outer box of the button. Calculated in [Dp]
+ * @param onClick Function to be executed after button clicked
+ * @param image Switches button mode between text and image
+ */
+@Composable
+fun GeneralButton(modifier: Modifier = Modifier, resourceId: Int, margin: Dp = 0.dp, onClick:() -> Unit, image: Boolean = false) {
+    GeneralButton(
+        resourceId = resourceId,
+        start = margin,
+        top = margin,
+        end = margin,
+        bottom = margin,
+        modifier = modifier,
+        onClick = onClick,
+        image = image,
+    )
 }
