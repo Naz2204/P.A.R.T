@@ -39,6 +39,7 @@ import androidx.core.os.LocaleListCompat
 import ua.ipze.kpi.part.router.StartPageData
 import ua.ipze.kpi.part.R
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
+import ua.ipze.kpi.part.providers.languageChange.localizedStringResource
 import ua.ipze.kpi.part.ui.theme.pixelBorder
 import java.util.Locale
 
@@ -55,7 +56,7 @@ fun InfoPage(setLanguage: (Context, String) -> Unit) {
         )
 
         Button(onClick = {}) {
-            Text(text = stringResource(R.string.world))
+            Text(text = localizedStringResource(R.string.login))
         }
 
         Button(onClick = { basic.nav.navigate(StartPageData) }) {
@@ -78,7 +79,7 @@ fun InfoPagePreview() {
             )
         }
 
-        Text(text = stringResource(R.string.world), modifier = Modifier
+        Text(text = localizedStringResource(R.string.run), modifier = Modifier
             .pixelBorder(4.dp)
             .clickable(onClick = { Log.d("Text test", "Text was clicked") })
         )

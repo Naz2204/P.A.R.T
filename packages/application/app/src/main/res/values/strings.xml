@@ -1,5 +1,21 @@
 <resources>
-    <string name="app_name" translatable="false">P.A.R.T</string>
-    <string name="hello">hello</string>
-    <string name="world">world</string>
+    <string name="app_name" translatable="false">P>A.R.T</string>
+    <string name="login">LOGIN</string>
+    <string name="run">RUN</string>
+    <string name="make_password">MAKE PASSWORD</string>
+    <string name="password">password</string>
+    <string name="repeat">repeat password</string>
+    <string name="new_art">New pixel art</string>
+    <string name="size">Size (WxH)</string>
+    <string name="init_color_scheme">Initial color scheme</string>
+    <string name="init_layers_num">Initial amount of layers</string>
+    <string name="name">Name</string>
+    <string name="bg_fill">Background fill</string>
+    <string name="make">Make</string>
+    <string name="merge_up">Merge up</string>
+    <string name="merge_down">Merge down</string>
+    <string name="export">Export</string>
+    <string name="projects">Projects</string>
+    <string name="language">Language</string>
+    <string name="exit">Exit</string>
 </resources>

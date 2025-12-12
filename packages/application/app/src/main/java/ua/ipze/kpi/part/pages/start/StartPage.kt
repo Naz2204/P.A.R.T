@@ -1,256 +1,376 @@
 package ua.ipze.kpi.part.pages.start
 
-import androidx.compose.foundation.Canvas
+import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import ua.ipze.kpi.part.pages.drawing.fragments.BottomBar
-import ua.ipze.kpi.part.pages.drawing.fragments.ColorPalette
-import ua.ipze.kpi.part.pages.drawing.fragments.LayersPanel
-import ua.ipze.kpi.part.pages.drawing.fragments.MenuDialog
-import ua.ipze.kpi.part.pages.drawing.fragments.TopToolbar
+import androidx.compose.ui.unit.sp
 import ua.ipze.kpi.part.R
-// Add this to your MainActivity onCreate method:
-/*
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+import ua.ipze.kpi.part.providers.languageChange.LanguageViewModel
+import ua.ipze.kpi.part.providers.languageChange.localizedStringResource
 
-        // Hide system bars
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val controller = WindowInsetsControllerCompat(window, window.decorView)
-        controller.hide(WindowInsetsCompat.Type.systemBars())
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-
-        setContent {
-            PixelArtEditorTheme {
-                PixelArtEditor()
-            }
-        }
-    }
-}
-*/
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StartPage() {
-    var showMenu by remember { mutableStateOf(false) }
-    var showColorPalette by remember { mutableStateOf(false) }
-    var showLayers by remember { mutableStateOf(false) }
-    var layerHidden by remember { mutableStateOf(false) }
-    var selectedTool by remember { mutableStateOf(0) }
-    var selectedColor by remember { mutableStateOf(Color(0xFFFFEB3B)) }
+fun StartPage(languageViewModel: LanguageViewModel) {
+    var screenType by remember { mutableStateOf(ScreenType.CREATE) }
+    var password by remember { mutableStateOf("") }
+    var repeatPassword by remember { mutableStateOf("") }
+    var savedPassword by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
-    val colors = listOf(
-        Color.White, Color.Black,
-        Color(0xFFD32F2F), Color(0xFF8B0000),
-        Color(0xFFFFC107), Color.Gray,
-        Color(0xFFFFEB3B)
-    )
-
-    val layers = remember { mutableStateListOf("Layer 0", "Layer 1", "Layer 2", "Layer 3") }
-    Box(modifier = Modifier.fillMaxSize()) {
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets(0, 0, 0, 0)),
-        topBar = {
-            TopToolbar(
-                selectedTool = selectedTool,
-                onToolSelected = { selectedTool = it },
-                onMenuClick = { showMenu = true },
-                onUndoClick = { TODO("Додати виклик undo") },
-                onRedoClick = { TODO("Додати виклик redo") }
+    Box (modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top) {
+            Image(
+                painter = painterResource(R.drawable.login_background),
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.Crop
             )
-        },
-        bottomBar = {
-            Column {
-                BottomBar(
-                    onLayersClick = { showLayers = !showLayers },
-                    onEyeClick = { layerHidden = !layerHidden },
-                    layerHidden, showLayers,
-                    "Change to actual size"
-                )
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showColorPalette = !showColorPalette }) {
-                Icon(painter = painterResource(R.drawable.color_selector_icon), contentDescription = "Add",
-                    tint = selectedColor)
-            }
-        },
-        containerColor = Color(0xFF424242),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color(0xFF616161))
-        ) {
-            PixelCanvas(modifier = Modifier.fillMaxSize())
+        }
 
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Top section with logo and pixel art background (takes ~35% of screen)
             Box(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-                    .size(48.dp)
-                    .background(Color(0xFF757575), RoundedCornerShape(4.dp))
-                    .border(2.dp, Color.White, RoundedCornerShape(4.dp)),
+                    .fillMaxWidth()
+                    .weight(if (screenType == ScreenType.LOGIN) 0.5f
+                    else 0.3f),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Tool",
-                    tint = selectedColor,
-                    modifier = Modifier.size(24.dp)
+                Text(
+                    text = localizedStringResource(R.string.app_name),
+                    fontSize = 62.sp,
+                    color = Color(0xffffffff),
+                    letterSpacing = 10.sp
                 )
             }
-        }
-        // Color Palette Panel - overlays on top
 
-        }
-        if (showColorPalette) {
-            Box(
+            // Bottom dark section with form (takes ~65% of screen)
+            Surface(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .fillMaxWidth()
+                    .weight(0.65f),
+                color = Color(0xFF4A5568),
+                shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp)
             ) {
-                Column {
-                    ColorPalette(
-                        colors = colors,
-                        selectedColor = selectedColor,
-                        onColorSelected = { selectedColor = it }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 48.dp)
+                        .padding(top = 25.dp, bottom = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = if (screenType == ScreenType.CREATE) localizedStringResource(R.string.make_password, viewModel=languageViewModel)
+                            else localizedStringResource(R.string.login, viewModel=languageViewModel),
+                        color = Color(0xFFFEF3C7),
+                        fontSize = 25.sp,
+                        letterSpacing = 6.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(bottom = 15.dp)
                     )
 
-                    // Spacer to account for bottom bar
-                    Spacer(modifier = Modifier.height(69.dp))
-                }
-            }
-        }
-
-        // Layers Panel - overlays on top
-        if (showLayers) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            ) {
-                Column {
-                    LayersPanel(layers = layers)
-
-                    // Spacer to account for bottom bar
-                    Spacer(modifier = Modifier.height(69.dp))
-                }
-            }
-        }
-        // Menu Dialog
-        if (showMenu) {
-            MenuDialog(onDismiss = { showMenu = false })
-        }
-    }
-}
-
-
-
-@Composable
-fun PixelCanvas(modifier: Modifier = Modifier) {
-    val gridSize = 10
-    val cellsPerRow = 18
-    val cellsPerColumn = 70
-
-    Canvas(modifier = modifier) {
-        val cellWidth = size.width / cellsPerRow
-        val cellHeight = size.height / cellsPerColumn
-
-        // Draw grid
-        for (i in 0..cellsPerRow) {
-            drawLine(
-                color = Color(0xFF757575),
-                start = Offset(i * cellWidth, 0f),
-                end = Offset(i * cellWidth, size.height),
-                strokeWidth = 1f
-            )
-        }
-
-        for (i in 0..cellsPerColumn) {
-            drawLine(
-                color = Color(0xFF757575),
-                start = Offset(0f, i * cellHeight),
-                end = Offset(size.width, i * cellHeight),
-                strokeWidth = 1f
-            )
-        }
-
-        // Draw some example pixels (checkerboard pattern)
-        for (row in 0 until cellsPerColumn) {
-            for (col in 0 until cellsPerRow) {
-                val isGray = (row + col) % 2 == 0
-                if (isGray) {
-                    drawRect(
-                        color = Color(0xFF9E9E9E),
-                        topLeft = Offset(col * cellWidth, row * cellHeight),
-                        size = androidx.compose.ui.geometry.Size(cellWidth, cellHeight)
-                    )
-                } else {
-                    drawRect(
-                        color = Color(0xFFBDBDBD),
-                        topLeft = Offset(col * cellWidth, row * cellHeight),
-                        size = androidx.compose.ui.geometry.Size(cellWidth, cellHeight)
-                    )
+                    when (screenType) {
+                        ScreenType.CREATE -> CreatePasswordScreen(
+                            password = password,
+                            repeatPassword = repeatPassword,
+                            showError = showError,
+                            languageViewModel = languageViewModel,
+                            onPasswordChange = {
+                                password = it
+                                showError = false
+                            },
+                            onRepeatPasswordChange = {
+                                repeatPassword = it
+                                showError = false
+                            },
+                            onRun = {
+                                if (password == repeatPassword && password.isNotEmpty()) {
+                                    savedPassword = password
+                                    password = ""
+                                    repeatPassword = ""
+                                    showError = false
+                                    screenType = ScreenType.LOGIN
+                                } else {
+                                    showError = true
+                                }
+                            }
+                        )
+                        ScreenType.LOGIN -> LoginScreen(
+                            password = password,
+                            showError = showError,
+                            languageViewModel = languageViewModel,
+                            onPasswordChange = {
+                                password = it
+                                showError = false
+                            },
+                            onRun = {
+                                if (password == savedPassword) {
+                                    showError = false
+                                } else {
+                                    showError = true
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+@Composable
+fun CreatePasswordScreen(
+    password: String,
+    repeatPassword: String,
+    showError: Boolean,
+    languageViewModel: LanguageViewModel,
+    onPasswordChange: (String) -> Unit,
+    onRepeatPasswordChange: (String) -> Unit,
+    onRun: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Password field (gold/orange border)
+        PasswordInputField(
+            label = "password",
+            value = password,
+            onValueChange = onPasswordChange,
+            placeholder = "",
+            borderColor = Color(0xFFEA923A)
+        )
 
+        Spacer(modifier = Modifier.height(40.dp))
 
+        // Repeat password field (red border when error, orange otherwise)
+        PasswordInputField(
+            label = "repeat password",
+            value = repeatPassword,
+            onValueChange = onRepeatPasswordChange,
+            placeholder = "",
+            borderColor = if (showError) Color(0xFFDC2626) else Color(0xFFEA923A)
+        )
 
+        Spacer(modifier = Modifier.height(64.dp))
 
-
-
+        // RUN button
+        RunButton(onClick = onRun, languageViewModel)
+    }
+}
 
 @Composable
-fun PixelArtEditorTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = darkColorScheme(
-            primary = Color(0xFFFFEB3B),
-            background = Color(0xFF424242),
-            surface = Color(0xFF303030)
-        ),
-        content = content
-    )
+fun LoginScreen(
+    password: String,
+    showError: Boolean,
+    languageViewModel: LanguageViewModel,
+    onPasswordChange: (String) -> Unit,
+    onRun: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Password field
+        PasswordInputField(
+            label = "Password",
+            value = password,
+            onValueChange = onPasswordChange,
+            placeholder = "",
+            borderColor = Color(0xFFEA923A)
+        )
+
+        Spacer(modifier = Modifier.height(64.dp))
+
+        // RUN button
+        RunButton(onClick = onRun, languageViewModel)
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        // Divider with "or"
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 32.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(1.dp)
+                    .background(Color(0xFF94A3B8))
+            )
+            Text(
+                text = "or",
+                style = TextStyle(
+                    color = Color(0xFFCBD5E1),
+                    fontSize = 14.sp
+                ),
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(1.dp)
+                    .background(Color(0xFF94A3B8))
+            )
+        }
+
+        // Fingerprint icon
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .border(4.dp, Color(0xFFEA923A), RoundedCornerShape(6.dp))
+                .background(Color(0xFF334155), RoundedCornerShape(6.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            // Fingerprint representation
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                repeat(5) { index ->
+                    Box(
+                        modifier = Modifier
+                            .width((40 - index * 7).dp)
+                            .height(3.dp)
+                            .background(Color(0xFFEA923A))
+                    )
+                    if (index < 4) {
+                        Spacer(modifier = Modifier.height(3.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PasswordInputField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    borderColor: Color
+) {
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            style = TextStyle(
+                color = Color.White,
+                fontSize = 14.sp
+            ),
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .border(3.dp, borderColor, RoundedCornerShape(6.dp)),
+            color = Color(0xFF2D3748),
+            shape = RoundedCornerShape(6.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = placeholder,
+                            style = TextStyle(
+                                color = Color(0xFF64748B),
+                                fontSize = 16.sp
+                            )
+                        )
+                    }
+                    BasicTextField(
+                        value = value,
+                        onValueChange = onValueChange,
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = TextStyle(
+                            color = Color.White,
+                            fontSize = 16.sp
+                        ),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        singleLine = true
+                    )
+                }
+
+                IconButton(
+                    onClick = { passwordVisible = !passwordVisible },
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(if (passwordVisible) R.drawable.open_eye else R.drawable.hidden_eye),
+                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                        tint = Color(0xFF94A3B8),
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RunButton(onClick: () -> Unit, languageViewModel: LanguageViewModel) {
+    Surface(
+        onClick = {
+            languageViewModel.setAppLanguage("en")
+            onClick()
+            Log.d("RunButton", "External onClick executed.")
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .border(4.dp, Color(0xFFB45309), RoundedCornerShape(6.dp)),
+        color = Color(0xFFEA923A),
+        shape = RoundedCornerShape(6.dp)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "RUN",
+                style = TextStyle(
+                    fontSize = 32.sp,
+                    letterSpacing = 14.sp,
+                    color = Color.White
+                )
+            )
+        }
+    }
+}
+
+enum class ScreenType {
+    CREATE,
+    LOGIN
 }

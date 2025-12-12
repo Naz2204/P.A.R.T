@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">привіт</string>
-    <string name="world">світ</string>
+    <string name="run">ПОЧАТИ</string>
+    <string name="login">УВІЙТИ</string>
+    <string name="make_password">СТВОРИТИ ПАРОЛЬ</string>
+    <string name="password">пароль</string>
+    <string name="repeat">повторіть пароль</string>
+    <string name="new_art">Новий піксель арт</string>
+    <string name="size">Розміри(ШхД)</string>
+    <string name="init_color_scheme">Початкова кольорова схема</string>
+    <string name="init_layers_num">Початкова кількість шарів</string>
+    <string name="name">Назва</string>
+    <string name="bg_fill">Колір фону</string>
+    <string name="make">Створити</string>
+    <string name="merge_up">Об\'єднати вгору</string>
+    <string name="merge_down">Об\'єднати вниз</string>
+    <string name="export">Експортувати</string>
+    <string name="projects">Проєкти</string>
+    <string name="language">Мова</string>
+    <string name="exit">Вийти</string>
 </resources>

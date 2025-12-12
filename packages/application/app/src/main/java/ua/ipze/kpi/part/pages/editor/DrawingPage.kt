@@ -1,4 +1,4 @@
-package ua.ipze.kpi.part.pages.drawing
+package ua.ipze.kpi.part.pages.editor
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -33,11 +33,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ua.ipze.kpi.part.R
-import ua.ipze.kpi.part.pages.drawing.fragments.BottomBar
-import ua.ipze.kpi.part.pages.drawing.fragments.ColorPalette
-import ua.ipze.kpi.part.pages.drawing.fragments.LayersPanel
-import ua.ipze.kpi.part.pages.drawing.fragments.MenuDialog
-import ua.ipze.kpi.part.pages.drawing.fragments.TopToolbar
+import ua.ipze.kpi.part.pages.editor.fragments.BottomBar
+import ua.ipze.kpi.part.pages.editor.fragments.ColorPalette
+import ua.ipze.kpi.part.pages.editor.fragments.LayersPanel
+import ua.ipze.kpi.part.pages.editor.fragments.MenuDialog
+import ua.ipze.kpi.part.pages.editor.fragments.TopToolbar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

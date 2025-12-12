@@ -10,34 +10,26 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import ua.ipze.kpi.part.providers.languageChange.LanguageViewModel
 import ua.ipze.kpi.part.router.AppRouter
 import ua.ipze.kpi.part.ui.theme.PARTTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val controller = WindowInsetsControllerCompat(window, window.decorView)
         controller.hide(WindowInsetsCompat.Type.systemBars())
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         enableEdgeToEdge()
         setContent {
+            val languageViewModel: LanguageViewModel = viewModel()
             PARTTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppRouter(innerPadding, {context: Context, language: String -> setLanguage(context, language)})
+                    AppRouter(innerPadding, languageViewModel)
                 }
             }
         }
-    }
-
-    fun setLanguage(context: Context, language: String) {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            context.getSystemService(LocaleManager::class.java)
-//                .applicationLocales = LocaleList.forLanguageTags(language)
-//        }
-//        else {
-//            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(language))
-//        }
-//        saveLanguage(context, language)
     }
 }

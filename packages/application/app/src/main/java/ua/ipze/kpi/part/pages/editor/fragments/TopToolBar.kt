@@ -1,4 +1,4 @@
-package ua.ipze.kpi.part.pages.drawing.fragments
+package ua.ipze.kpi.part.pages.editor.fragments
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
