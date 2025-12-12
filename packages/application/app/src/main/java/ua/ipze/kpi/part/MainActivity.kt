@@ -1,5 +1,4 @@
 package ua.ipze.kpi.part
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,9 +10,11 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ua.ipze.kpi.part.providers.languageChange.LanguageViewModel
+import ua.ipze.kpi.part.views.LanguageViewModel
 import ua.ipze.kpi.part.router.AppRouter
 import ua.ipze.kpi.part.ui.theme.PARTTheme
+import ua.ipze.kpi.part.views.PasswordViewModel
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,9 +26,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val languageViewModel: LanguageViewModel = viewModel()
+            val passwordViewModel: PasswordViewModel = viewModel()
+
             PARTTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppRouter(innerPadding, languageViewModel)
+                    AppRouter(innerPadding, languageViewModel, passwordViewModel)
                 }
             }
         }

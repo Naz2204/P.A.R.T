@@ -1,7 +1,5 @@
 package ua.ipze.kpi.part.router
 
-import android.content.Context
-import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -15,18 +13,21 @@ import androidx.navigation.compose.rememberNavController
 import ua.ipze.kpi.part.pages.creation.CreationPage
 import ua.ipze.kpi.part.pages.editor.EditorPage
 import ua.ipze.kpi.part.pages.gallery.GalleryPage
+import ua.ipze.kpi.part.pages.login.LoginPage
+import ua.ipze.kpi.part.pages.login.PasswordCreationPage
 import ua.ipze.kpi.part.providers.basePageData.BasePageData
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
-import ua.ipze.kpi.part.providers.languageChange.LanguageViewModel
+import ua.ipze.kpi.part.views.LanguageViewModel
+import ua.ipze.kpi.part.views.PasswordViewModel
 
 @Composable
-fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel) {
+fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel, passwordViewModel: PasswordViewModel) {
     val navController = rememberNavController()
-    val basicPageData = remember { BasePageData(innerPadding, navController) }
-    Log.d("Recreate", "Router recreated")
+    val basicPageData = remember { BasePageData(innerPadding, navController, languageViewModel) }
+
     CompositionLocalProvider(BasePageDataProvider provides basicPageData) {
         NavHost(
-            navController = navController, startDestination = GalleryAppData,
+            navController = navController, startDestination = if (passwordViewModel.passwordExists) LoginPageData else PasswordCreationPageData,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -51,11 +52,11 @@ fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel)
                     animationSpec = tween(300, easing = FastOutSlowInEasing)
                 )
             }) {
-            composable<CreatePasswordPageData> {  }
-            composable<LoginPageData> {  }
+            composable<PasswordCreationPageData> { PasswordCreationPage(passwordViewModel) }
+            composable<LoginPageData> { LoginPage(passwordViewModel) }
             composable<CreateArtPageData> { CreationPage(languageViewModel) }
-            composable<GalleryAppData> { GalleryPage() }
-            composable<EditorAppData> { EditorPage() }
+            composable<GalleryPageData> { GalleryPage() }
+            composable<EditorPageData> { EditorPage() }
         }
     }
 }

@@ -64,4 +64,6 @@ dependencies {
     implementation(libs.androidx.compose.navigation)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.biometric)
+    implementation(libs.androidx.security)
+    implementation(libs.jbcrypt)
 }

@@ -1,7 +1,8 @@
-package ua.ipze.kpi.part.providers.languageChange
+package ua.ipze.kpi.part.views
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.LocaleList
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
@@ -13,8 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import java.util.Locale
-
-// --- STATE MANAGEMENT ---
 
 data class AppLocaleState(
     val currentLocale: Locale = Locale.getDefault()
@@ -37,18 +36,13 @@ class LanguageViewModel : ViewModel() {
     }
 }
 
-// --- LOCALIZATION UTILITY ---
-
 fun getLocalizedContext(context: Context, locale: Locale): Context {
     val config = Configuration(context.resources.configuration)
     config.setLocale(locale)
-    val localeList = android.os.LocaleList(locale)
+    val localeList = LocaleList(locale)
     config.setLocales(localeList)
     return  context.createConfigurationContext(config)
 }
-
-
-// --- THE CUSTOM STRING RESOURCE COMPOSABLE ---
 
 @Composable
 fun localizedStringResource(
@@ -66,26 +60,4 @@ fun localizedStringResource(
     return localizedContext.resources.getString(id, *formatArgs)
 }
 
-//  TODO прибрати цей коментар перед завершенням розробки
-// --- EXAMPLE USAGE COMPOSABLE ---
-
-//@Composable
-//fun LanguageSwitcherScreenExample() {
-//    val viewModel: LanguageViewModel = viewModel()
-//
-//    // Use the custom function for all strings that should dynamically update
-//    val greetingText = localizedStringResource(id = R.string.greeting)
-//    val appTitle = localizedStringResource(id = R.string.app_name)
-//
-//    Text(text = appTitle)
-//    Text(text = greetingText)
-//
-//    Button(onClick = { viewModel.setAppLanguage("es") }) {
-//        Text(text = "Cambiar a Español")
-//    }
-//
-//    Button(onClick = { viewModel.setAppLanguage("en") }) {
-//        Text(text = "Switch to English")
-//    }
-//}
 

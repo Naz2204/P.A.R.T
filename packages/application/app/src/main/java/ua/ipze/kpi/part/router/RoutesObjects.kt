@@ -6,13 +6,13 @@ import kotlinx.serialization.Serializable
 data object LoginPageData
 
 @Serializable
-data object CreatePasswordPageData
+data object PasswordCreationPageData
 
 @Serializable
 data object CreateArtPageData
 
 @Serializable
-data object GalleryAppData
+data object GalleryPageData
 
 @Serializable
-data object EditorAppData
+data object EditorPageData

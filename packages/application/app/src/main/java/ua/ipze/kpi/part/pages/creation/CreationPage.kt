@@ -39,8 +39,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ua.ipze.kpi.part.R
-import ua.ipze.kpi.part.providers.languageChange.LanguageViewModel
-import ua.ipze.kpi.part.providers.languageChange.localizedStringResource
+import ua.ipze.kpi.part.views.LanguageViewModel
+import ua.ipze.kpi.part.views.localizedStringResource
 import ua.ipze.kpi.part.ui.theme.pixelBorder
 import ua.ipze.kpi.part.ui.theme.topBottomBorder
 import ua.ipze.kpi.part.widgets.inputs.DropdownSelector
