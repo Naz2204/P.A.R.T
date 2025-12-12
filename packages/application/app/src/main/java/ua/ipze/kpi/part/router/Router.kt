@@ -15,9 +15,10 @@ import ua.ipze.kpi.part.pages.info.InfoPage
 import ua.ipze.kpi.part.pages.start.StartPage
 import ua.ipze.kpi.part.providers.basePageData.BasePageData
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
+import ua.ipze.kpi.part.providers.languageChange.LanguageViewModel
 
 @Composable
-fun AppRouter(innerPadding: PaddingValues, setLanguage: (Context, String) -> Unit) {
+fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel) {
     val navController = rememberNavController()
     val basicPageData = remember { BasePageData(innerPadding, navController) }
 
@@ -48,8 +49,8 @@ fun AppRouter(innerPadding: PaddingValues, setLanguage: (Context, String) -> Uni
                     animationSpec = tween(300, easing = FastOutSlowInEasing)
                 )
             }) {
-            composable<StartPageData> { StartPage() }
-            composable<InfoPageData> { InfoPage(setLanguage) }
+            composable<StartPageData> { StartPage(languageViewModel = languageViewModel) }
+//            composable<InfoPageData> { InfoPage() }
         }
     }
 }
