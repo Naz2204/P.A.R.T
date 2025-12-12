@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.ui)
     implementation(libs.androidx.foundation.layout)
+    implementation(libs.androidx.media3.exoplayer)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,4 +62,5 @@ dependencies {
     // ---
     implementation(libs.androidx.compose.navigation)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.biometric)
 }

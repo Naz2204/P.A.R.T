@@ -15,9 +15,9 @@ class Drawing(historyLength: UInt, widthAmountPixels: UInt, heightAmountPixels: 
 
     private val bitmap: Bitmap =
         Bitmap.createBitmap(widthAmountPixels.toInt(), heightAmountPixels.toInt(), Bitmap.Config.ARGB_8888);
-    private val amountOfSteps: MutableStateFlow<DrawingAmountOfSteps> = DrawingAmountOfSteps(0, 0);
+//    private val amountOfSteps: MutableStateFlow<DrawingAmountOfSteps> = DrawingAmountOfSteps(0, 0);
 
-    init {;
+    init {
 
     }
 
@@ -43,6 +43,7 @@ class Drawing(historyLength: UInt, widthAmountPixels: UInt, heightAmountPixels: 
 
     override fun pickColorAt(offset: Offset): Color {
 
+        return TODO("Provide the return value")
     }
 
     // ----------------------------------------------------
@@ -72,6 +73,7 @@ class Drawing(historyLength: UInt, widthAmountPixels: UInt, heightAmountPixels: 
 
     override fun getAmountOfSteps(): StateFlow<DrawingAmountOfSteps> {
 
+        return TODO("Provide the return value")
     }
 
     // ----------------------------------------------------
@@ -93,10 +95,12 @@ class Drawing(historyLength: UInt, widthAmountPixels: UInt, heightAmountPixels: 
 
     override fun load(file: File): Result<Unit> {
 
+        return TODO("Provide the return value")
     }
 
     override fun storeToPng(): ByteArray {
 
+        return TODO("Provide the return value")
     }
 
 }
