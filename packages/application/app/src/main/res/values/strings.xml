@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">P.A.R.T</string>
+    <string name="app_name" translatable="false">P.A.R.T</string>
+    <string name="hello">hello</string>
+    <string name="world">world</string>
 </resources>
