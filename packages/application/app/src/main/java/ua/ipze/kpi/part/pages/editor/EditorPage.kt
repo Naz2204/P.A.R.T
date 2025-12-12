@@ -41,7 +41,7 @@ import ua.ipze.kpi.part.pages.editor.fragments.TopToolbar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawingPage() {
+fun EditorPage() {
     var showMenu by remember { mutableStateOf(false) }
     var showColorPalette by remember { mutableStateOf(false) }
     var showLayers by remember { mutableStateOf(false) }

@@ -1,4 +1,4 @@
-package ua.ipze.kpi.part.pages.galery
+package ua.ipze.kpi.part.pages.gallery
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,7 +29,7 @@ data class ArtItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GaleryPage(
+fun GalleryPage(
     onNavigateToEditor: (Int) -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(0) }

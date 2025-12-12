@@ -3,7 +3,16 @@ package ua.ipze.kpi.part.router
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object StartPageData
+data object LoginPageData
 
 @Serializable
-data object InfoPageData
+data object CreatePasswordPageData
+
+@Serializable
+data object CreateArtPageData
+
+@Serializable
+data object GalleryAppData
+
+@Serializable
+data object EditorAppData

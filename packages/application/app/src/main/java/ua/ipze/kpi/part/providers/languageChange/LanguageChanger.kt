@@ -26,6 +26,7 @@ class LanguageViewModel : ViewModel() {
 
     fun setAppLanguage(languageCode: String) {
         val newLocale = Locale.forLanguageTag(languageCode)
+        Log.d("CurrentLocale", "New locale $newLocale")
         localeState = localeState.copy(currentLocale = newLocale)
         // TODO: Persist the 'languageCode' here using DataStore/SharedPreferences
     }
