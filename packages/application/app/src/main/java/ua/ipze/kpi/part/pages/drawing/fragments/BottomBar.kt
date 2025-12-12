@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,11 +36,9 @@ fun BottomBar(
     layersOpen: Boolean,
     imageSize: String
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    val maxBottomBar = 69.dp
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().height(height = maxBottomBar),
             verticalArrangement = Arrangement.Bottom
         ) {
             Row(verticalAlignment = Alignment.CenterVertically,
@@ -47,7 +46,7 @@ fun BottomBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFF60646A))
-                    .padding(top=0.dp, bottom = 0.dp, start = 5.dp, end = 5.dp)
+                    .padding(horizontal = 10.dp, vertical = 0.dp)
             ) {
                 Text(
                     text = "Layer 1",
@@ -85,7 +84,7 @@ fun BottomBar(
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth().background(Color(0xff383d43))
-                    .padding(top=3.dp, bottom = 4.dp, start = 6.dp, end = 6.dp)
+                    .padding(top=3.dp, bottom = 4.dp, start = 15.dp, end = 20.dp)
                 ) {
                     Text(
                         text = imageSize,
@@ -100,6 +99,6 @@ fun BottomBar(
                         fontSize = 14.sp,
                     )
                 }
-        }
+
     }
 }

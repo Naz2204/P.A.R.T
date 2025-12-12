@@ -1,76 +1,189 @@
 package ua.ipze.kpi.part.pages.drawing.fragments
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import ua.ipze.kpi.part.R
+import ua.ipze.kpi.part.ui.theme.pixelBorder
 
 @Composable
 fun TopToolbar(
     selectedTool: Int,
     onToolSelected: (Int) -> Unit,
-    onMenuClick: () -> Unit
+    onMenuClick: () -> Unit,
+    onUndoClick: () -> Unit,
+    onRedoClick: () -> Unit,
 ) {
-    Surface(
-        color = Color(0xFF303030),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
+        Column (
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+                .padding(4.dp)
         ) {
             val tools = listOf(
-                Icons.Default.Refresh,
-                Icons.Default.Add,
-                Icons.Default.List,
-                Icons.Default.Settings,
-                Icons.Default.Edit,
-                Icons.Default.Create,
-                Icons.Default.AccountBox,
-                Icons.Default.Clear
+                R.drawable.undo_tool_icon,
+                R.drawable.redo_tool_icon,
+                R.drawable.custom_move_icon,
+                R.drawable.settings_icon,
+                R.drawable.pen_tool_icon,
+                R.drawable.eraser_tool_icon,
+                R.drawable.select_tool_icon,
+                R.drawable.color_picker_tool_icon
             )
-
-            tools.forEachIndexed { index, icon ->
-                IconButton(
-                    onClick = {
-                        if (index == 3) onMenuClick()
-                        else onToolSelected(index)
-                    },
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(
-                            if (selectedTool == index) Color(0xFF424242) else Color.Transparent,
-                            RoundedCornerShape(4.dp)
-                        )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = "Tool $index",
-                        tint = if (index == 0 || index == 4) Color(0xFFD32F2F) else Color(0xFF9E9E9E)
-                    )
+                    IconButton(
+                        onClick = {
+                            onUndoClick()
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(tools[0]),
+                            contentDescription = null,
+                            tint = Color(0xffffffff),
+                            modifier = Modifier
+                                .pixelBorder(borderWidth = 2.dp)
+                                .padding(2.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            onRedoClick()
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(tools[1]),
+                            contentDescription = null,
+                            tint = Color(0xffffffff),
+                            modifier = Modifier
+                                .pixelBorder(borderWidth = 2.dp)
+                                .padding(2.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            TODO("Додати виклик альтернативного керування")
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(tools[2]),
+                            contentDescription = null,
+                            tint = Color(0xffffffff),
+                            modifier = Modifier
+                                .pixelBorder(borderWidth = 2.dp)
+                                .padding(2.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            onMenuClick()
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(tools[3]),
+                            contentDescription = null,
+                            tint = Color(0xffffffff),
+                            modifier = Modifier
+                                .pixelBorder(borderWidth = 2.dp)
+                                .padding(2.dp)
+                        )
+                    }
                 }
-            }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    IconButton(
+                        onClick = {
+                            onToolSelected(4)
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(tools[4]),
+                            contentDescription = null,
+                            tint = Color(0xffffffff),
+                            modifier = Modifier
+                                .pixelBorder(
+                                    borderWidth = 2.dp,
+                                    innerColor = if (selectedTool == 4) Color(0xff903d39)
+                                    else Color.LightGray
+                                )
+                                .padding(2.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            onToolSelected(5)
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(tools[5]),
+                            contentDescription = null,
+                            tint = Color(0xffffffff),
+                            modifier = Modifier
+                                .pixelBorder(
+                                    borderWidth = 2.dp,
+                                    innerColor = if (selectedTool == 5) Color(0xff903d39)
+                                    else Color.LightGray
+                                )
+                                .padding(2.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            onToolSelected(6)
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(tools[6]),
+                            contentDescription = null,
+                            tint = Color(0xffffffff),
+                            modifier = Modifier
+                                .pixelBorder(
+                                    borderWidth = 2.dp,
+                                    innerColor = if (selectedTool == 6) Color(0xff903d39)
+                                    else Color.LightGray
+                                )
+                                .padding(2.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            onToolSelected(7)
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(tools[7]),
+                            contentDescription = null,
+                            tint = Color(0xffffffff),
+                            modifier = Modifier
+                                .pixelBorder(
+                                    borderWidth = 2.dp,
+                                    innerColor = if (selectedTool == 7) Color(0xff903d39)
+                                    else Color.LightGray
+                                )
+                                .padding(2.dp)
+                        )
+                    }
+                }
         }
     }
-}

@@ -90,7 +90,9 @@ fun StartPage() {
             TopToolbar(
                 selectedTool = selectedTool,
                 onToolSelected = { selectedTool = it },
-                onMenuClick = { showMenu = true }
+                onMenuClick = { showMenu = true },
+                onUndoClick = { TODO("Додати виклик undo") },
+                onRedoClick = { TODO("Додати виклик redo") }
             )
         },
         bottomBar = {
@@ -120,7 +122,6 @@ fun StartPage() {
         ) {
             PixelCanvas(modifier = Modifier.fillMaxSize())
 
-            // Tool indicator (bottom right)
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -155,7 +156,7 @@ fun StartPage() {
                     )
 
                     // Spacer to account for bottom bar
-                    Spacer(modifier = Modifier.height(64.dp))
+                    Spacer(modifier = Modifier.height(69.dp))
                 }
             }
         }
@@ -171,7 +172,7 @@ fun StartPage() {
                     LayersPanel(layers = layers)
 
                     // Spacer to account for bottom bar
-                    Spacer(modifier = Modifier.height(56.dp))
+                    Spacer(modifier = Modifier.height(69.dp))
                 }
             }
         }
