@@ -2,11 +2,8 @@ package ua.ipze.kpi.part.providers.languageChange
 
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,7 +25,7 @@ class LanguageViewModel : ViewModel() {
         private set
 
     fun setAppLanguage(languageCode: String) {
-        val newLocale = Locale(languageCode)
+        val newLocale = Locale.forLanguageTag(languageCode)
         localeState = localeState.copy(currentLocale = newLocale)
         // TODO: Persist the 'languageCode' here using DataStore/SharedPreferences
     }
@@ -43,19 +40,10 @@ class LanguageViewModel : ViewModel() {
 
 fun getLocalizedContext(context: Context, locale: Locale): Context {
     val config = Configuration(context.resources.configuration)
-
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        config.setLocale(locale)
-        val localeList = android.os.LocaleList(locale)
-        config.setLocales(localeList)
-        context.createConfigurationContext(config)
-    } else {
-        @Suppress("DEPRECATION")
-        config.locale = locale
-        @Suppress("DEPRECATION")
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
-        context
-    }
+    config.setLocale(locale)
+    val localeList = android.os.LocaleList(locale)
+    config.setLocales(localeList)
+    return  context.createConfigurationContext(config)
 }
 
 
@@ -77,7 +65,7 @@ fun localizedStringResource(
     return localizedContext.resources.getString(id, *formatArgs)
 }
 
-
+//  TODO прибрати цей коментар перед завершенням розробки
 // --- EXAMPLE USAGE COMPOSABLE ---
 
 //@Composable

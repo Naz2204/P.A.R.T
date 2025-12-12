@@ -6,7 +6,7 @@
     <string name="password">пароль</string>
     <string name="repeat">повторіть пароль</string>
     <string name="new_art">Новий піксель арт</string>
-    <string name="size">Розміри(ШхД)</string>
+    <string name="size">Розміри(ШхВ)</string>
     <string name="init_color_scheme">Початкова кольорова схема</string>
     <string name="init_layers_num">Початкова кількість шарів</string>
     <string name="name">Назва</string>

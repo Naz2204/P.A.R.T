@@ -49,7 +49,8 @@ fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel)
                     animationSpec = tween(300, easing = FastOutSlowInEasing)
                 )
             }) {
-            composable<StartPageData> { StartPage(languageViewModel = languageViewModel) }
+//            composable<StartPageData> { StartPage(languageViewModel = languageViewModel) }
+            composable<StartPageData> { StartPage() }
 //            composable<InfoPageData> { InfoPage() }
         }
     }
