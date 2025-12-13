@@ -13,14 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -33,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -87,7 +81,7 @@ fun ArtCard(item: ArtItem, onCardClick: (ArtItem) -> Unit = {}) {
             )
 
             // Bottom section
-            Row(
+            if (!showMenu) Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 8.dp, end = 4.dp, bottom = 8.dp, top = 4.dp),
@@ -109,46 +103,61 @@ fun ArtCard(item: ArtItem, onCardClick: (ArtItem) -> Unit = {}) {
                         fontSize = 11.sp
                     )
                 }
-
-                Box {
+                IconButton(
+                    onClick = { showMenu = true },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = "More options",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            else Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 4.dp, bottom = 8.dp, top = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row() {
                     IconButton(
-                        onClick = { showMenu = true },
+                        onClick = { TODO("Додати виклик видалення роботи") },
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "More options",
+                            painter = painterResource(R.drawable.trash_bin),
+                            contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(20.dp)
                         )
                     }
 
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                    IconButton(
+                        onClick = { TODO("Додати виклик зміни назви") },
+                        modifier = Modifier.size(32.dp)
                     ) {
-                        DropdownMenuItem(
-                            text = { Text("Delete") },
-                            onClick = { showMenu = false },
-                            leadingIcon = {
-                                Icon(painter = painterResource(R.drawable.trash_bin), contentDescription = null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Edit") },
-                            onClick = { showMenu = false },
-                            leadingIcon = {
-                                Icon(painter = painterResource(R.drawable.pen_tool_icon), contentDescription = null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Close") },
-                            onClick = { showMenu = false },
-                            leadingIcon = {
-                                Icon(painter = painterResource(R.drawable.close_x_icon), contentDescription = null)
-                            }
+                        Icon(
+                            painter = painterResource(R.drawable.pen_tool_icon),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
+                }
+
+                IconButton(
+                    onClick = { showMenu = false },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.close_x_icon),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }
