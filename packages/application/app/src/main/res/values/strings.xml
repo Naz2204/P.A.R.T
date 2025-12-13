@@ -18,4 +18,7 @@
     <string name="projects">Projects</string>
     <string name="language">Language</string>
     <string name="exit">Exit</string>
+    <string name="or">or</string>
+    <string name="fingerprint_title">Unlock galery</string>
+    <string name="fingerprint_description">Use your fingerprint to unlock the galery</string>
 </resources>

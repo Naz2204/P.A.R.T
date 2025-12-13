@@ -65,5 +65,5 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.security)
-    implementation(libs.jbcrypt)
+    implementation(libs.google.material)
 }

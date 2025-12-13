@@ -10,14 +10,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -30,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -47,8 +54,9 @@ import ua.ipze.kpi.part.ui.theme.topBottomBorder
 
 @Composable
 fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
-    var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
+
+    val scrollState = rememberScrollState()
 
     var showError by remember { mutableStateOf(false) }
 
@@ -63,7 +71,6 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
                 contentScale = ContentScale.Crop
             )
         }
-
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -84,6 +91,9 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
             }
             Surface(
                 modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .windowInsetsPadding(WindowInsets.ime)
+                    .verticalScroll(scrollState)
                     .fillMaxWidth()
                     .weight(0.65f),
                 color = Color(0xFF4A5568),
@@ -113,7 +123,8 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
                             value = passwordViewModel.passwordInput,
                             onValueChange = {passwordViewModel.passwordInput = it},
                             placeholder = "",
-                            borderColor = Color(0xFFEA923A)
+                            borderColor = if (showError) listOf(Color(0xffe53e2e), Color(0xff9e5f59))
+                            else listOf(Color(0xffedb768), Color(0xff987d55))
                         )
 
                         Spacer(modifier = Modifier.height(40.dp))
@@ -123,25 +134,26 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
                             value = repeatPassword,
                             onValueChange = {repeatPassword = it},
                             placeholder = "",
-                            borderColor = if (showError) Color(0xFFDC2626) else Color(0xFFEA923A)
+                            borderColor = if (showError) listOf(Color(0xffe53e2e), Color(0xff9e5f59))
+                            else listOf(Color(0xffedb768), Color(0xff987d55))
                         )
 
                         Spacer(modifier = Modifier.height(64.dp))
 
                         Box(modifier = Modifier
-                            .topBottomBorder(4.dp, Color(0xffffffff), Color(0xff53565A))
+                            .topBottomBorder(4.dp, Color(0xffedb768), Color.Transparent)
                             .clickable(onClick = {
-                                if (passwordViewModel.passwordInput == repeatPassword && passwordViewModel.passwordInput.isNotEmpty()) {
-                                    passwordViewModel.createPass()
-                                    passwordViewModel.passwordInput = ""
-                                    repeatPassword = ""
+                                if (passwordViewModel.passwordInput == repeatPassword) {
                                     showError = false
+                                    passwordViewModel.createPass()
                                     data.nav.navigate(GalleryPageData)
                                 } else {
                                     showError = true
                                 }
                             })
-
+                            .background(brush = Brush.linearGradient(
+                                colors = listOf(Color(0x03edb768), Color(0x99edb768), Color(0x03edb768))
+                            ))
                         ) {
                             Text(text = localizedStringResource(R.string.run), color = Color(0xffffffff),
                                 textAlign = TextAlign.Center, fontSize = 30.sp,

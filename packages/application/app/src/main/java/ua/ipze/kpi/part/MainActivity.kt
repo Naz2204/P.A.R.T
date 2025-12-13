@@ -1,8 +1,8 @@
 package ua.ipze.kpi.part
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
@@ -13,9 +13,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ua.ipze.kpi.part.views.LanguageViewModel
 import ua.ipze.kpi.part.router.AppRouter
 import ua.ipze.kpi.part.ui.theme.PARTTheme
+import ua.ipze.kpi.part.utils.Biometry
 import ua.ipze.kpi.part.views.PasswordViewModel
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private val promptManager by lazy {
+        Biometry(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -30,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
             PARTTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppRouter(innerPadding, languageViewModel, passwordViewModel)
+                    AppRouter(innerPadding, languageViewModel, passwordViewModel, promptManager)
                 }
             }
         }

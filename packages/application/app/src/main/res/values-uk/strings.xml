@@ -18,4 +18,7 @@
     <string name="projects">Проєкти</string>
     <string name="language">Мова</string>
     <string name="exit">Вийти</string>
+    <string name="or">або</string>
+    <string name="fingerprint_title">Розблокувати галерею</string>
+    <string name="fingerprint_description">Використайте відбиток пяльця, щоб розблокувати галерею</string>
 </resources>

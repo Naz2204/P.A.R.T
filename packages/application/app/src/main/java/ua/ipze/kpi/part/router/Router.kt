@@ -17,11 +17,13 @@ import ua.ipze.kpi.part.pages.login.LoginPage
 import ua.ipze.kpi.part.pages.login.PasswordCreationPage
 import ua.ipze.kpi.part.providers.basePageData.BasePageData
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
+import ua.ipze.kpi.part.utils.Biometry
 import ua.ipze.kpi.part.views.LanguageViewModel
 import ua.ipze.kpi.part.views.PasswordViewModel
 
 @Composable
-fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel, passwordViewModel: PasswordViewModel) {
+fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel, passwordViewModel: PasswordViewModel,
+              promptManager: Biometry) {
     val navController = rememberNavController()
     val basicPageData = remember { BasePageData(innerPadding, navController, languageViewModel) }
 
@@ -53,7 +55,7 @@ fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel,
                 )
             }) {
             composable<PasswordCreationPageData> { PasswordCreationPage(passwordViewModel) }
-            composable<LoginPageData> { LoginPage(passwordViewModel) }
+            composable<LoginPageData> { LoginPage(passwordViewModel, promptManager) }
             composable<CreateArtPageData> { CreationPage(languageViewModel) }
             composable<GalleryPageData> { GalleryPage() }
             composable<EditorPageData> { EditorPage() }
