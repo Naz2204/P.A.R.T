@@ -29,7 +29,7 @@ fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel,
 
     CompositionLocalProvider(BasePageDataProvider provides basicPageData) {
         NavHost(
-            navController = navController, startDestination = if (passwordViewModel.passwordExists) LoginPageData else PasswordCreationPageData,
+            navController = navController, startDestination = GalleryPageData,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -54,10 +54,10 @@ fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel,
                     animationSpec = tween(300, easing = FastOutSlowInEasing)
                 )
             }) {
-            composable<PasswordCreationPageData> { PasswordCreationPage(passwordViewModel) }
-            composable<LoginPageData> { LoginPage(passwordViewModel, promptManager) }
+            composable<LoginPageData> { if (passwordViewModel.passwordExists) LoginPage(passwordViewModel, promptManager) else PasswordCreationPage(passwordViewModel) }
+//            composable<LoginPageData> { LoginPage(passwordViewModel, promptManager) }
             composable<CreateArtPageData> { CreationPage(languageViewModel) }
-            composable<GalleryPageData> { GalleryPage() }
+            composable<GalleryPageData> { GalleryPage(passwordViewModel) }
             composable<EditorPageData> { EditorPage() }
         }
     }

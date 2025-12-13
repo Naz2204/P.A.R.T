@@ -25,8 +25,9 @@ class PasswordViewModel(application: Application) : AndroidViewModel(application
         checkPasswordExists()
     }
 
-    fun onPasswordChange(newPassword: String) {
-        passwordInput = newPassword
+    fun clearPassword() {
+        passwordStore.clearPassword()
+        passwordExists = false
     }
 
     private fun checkPasswordExists() {
@@ -38,6 +39,7 @@ class PasswordViewModel(application: Application) : AndroidViewModel(application
     fun createPass() {
         passwordStore.savePassword(passwordInput)
         isAuthenticated = true
+        passwordExists = true
     }
 
     fun handleLogin(){

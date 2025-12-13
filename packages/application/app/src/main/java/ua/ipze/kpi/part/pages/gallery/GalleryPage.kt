@@ -1,6 +1,7 @@
 package ua.ipze.kpi.part.pages.gallery
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -14,11 +15,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ua.ipze.kpi.part.R
+import ua.ipze.kpi.part.pages.gallery.fragments.ArtCard
+import ua.ipze.kpi.part.pages.login.PasswordCreationPage
+import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
+import ua.ipze.kpi.part.router.CreateArtPageData
+import ua.ipze.kpi.part.router.LoginPageData
+import ua.ipze.kpi.part.views.PasswordViewModel
+import ua.ipze.kpi.part.views.localizedStringResource
+
 data class ArtItem(
     val id: Int,
     val imageRes: Int,
@@ -30,11 +40,13 @@ data class ArtItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GalleryPage(
-    onNavigateToEditor: (Int) -> Unit = {}
+//    onNavigateToEditor: (Int) -> Unit = {}
+    passwordViewModel: PasswordViewModel
 ) {
+    val data = BasePageDataProvider.current
+
     var selectedTab by remember { mutableStateOf(0) }
 
-    // Sample data - replace imageRes with your actual drawable resources
     val artItems = List(8) { index ->
         ArtItem(
             id = index,
@@ -57,15 +69,14 @@ fun GalleryPage(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF2B2B2B))
                     .padding(vertical = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "P>A.R.T",
+                    text = localizedStringResource(R.string.app_name),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
                 )
                 Text(
                     text = "for real turteles",
@@ -78,90 +89,100 @@ fun GalleryPage(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF2B2B2B))
                     .padding(horizontal = 32.dp, vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable(onClick = {
+                        selectedTab = 0
+                    })
                 ) {
                     Icon(
-                        Icons.Default.Edit,
-                        contentDescription = "Drawings",
-                        tint = Color(0xFFE57373),
+                        painter = painterResource(R.drawable.image_frame_icon),
+                        contentDescription = null,
+                        tint = if (selectedTab == 0) Color(0xFFE57373) else Color(0xffffffff),
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        "drawings",
-                        color = Color(0xFFE57373),
+                        localizedStringResource(R.string.drawings),
+                        color = if (selectedTab == 0) Color(0xFFE57373) else Color(0xffffffff),
                         fontSize = 12.sp
                     )
                 }
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable(onClick = {
+                        selectedTab = 1
+                    })
                 ) {
                     Icon(
-                        Icons.Default.LocationOn,
-                        contentDescription = "Map",
-                        tint = Color.White,
+                        painter = painterResource(R.drawable.app_theams_icon),
+                        contentDescription = null,
+                        tint = if (selectedTab == 1) Color(0xFFE57373) else Color(0xffffffff),
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        "map",
-                        color = Color.White,
+                        localizedStringResource(R.string.app_themes),
+                        color = if (selectedTab == 1) Color(0xFFE57373) else Color(0xffffffff),
                         fontSize = 12.sp
                     )
                 }
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).clickable(onClick = {
+                        passwordViewModel.clearPassword()
+                        data.nav.navigate(LoginPageData)
+                    })
                 ) {
                     Icon(
-                        Icons.Default.Build,
-                        contentDescription = "Themes",
-                        tint = Color.White,
+                        painter = painterResource(R.drawable.key_icon),
+                        contentDescription = null,
+                        tint = Color(0xffffffff),
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        "app themes",
-                        color = Color.White,
+                        localizedStringResource(R.string.change_key),
+                        color = Color(0xffffffff),
                         fontSize = 12.sp
                     )
                 }
             }
 
-            Divider(
-                color = Color.White,
-                thickness = 1.dp,
-                modifier = Modifier.padding(horizontal = 32.dp)
-            )
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp)
+                        .background(Color(0xffffffff))
+                )
+            }
 
-            // Add button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
-                FloatingActionButton(
-                    onClick = { /* Add new item */ },
-                    containerColor = Color(0xFF424242),
-                    contentColor = Color.White,
-                    modifier = Modifier.size(56.dp),
-                    shape = CircleShape
+                IconButton(
+                    onClick = {
+                        data.nav.navigate(CreateArtPageData)
+                    },
                 ) {
                     Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Add",
-                        modifier = Modifier.size(32.dp)
+                        painter = painterResource(R.drawable.add_button_icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        tint = Color(0xffffffff)
                     )
                 }
             }
@@ -178,127 +199,9 @@ fun GalleryPage(
                     ArtCard(
                         item = item,
                         onCardClick = { clickedItem ->
-                            onNavigateToEditor(clickedItem.id)
+//                            onNavigateToEditor(clickedItem.id)
                         }
                     )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ArtCard(item: ArtItem, onCardClick: (ArtItem) -> Unit = {}) {
-    var showMenu by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(0.68f),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2B2B2B)
-        ),
-        shape = RoundedCornerShape(4.dp),
-        onClick = { onCardClick(item) }
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Image
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(4.dp)
-            ) {
-                // Replace with actual image loading (Coil or Glide)
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFF87CEEB)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "🐢",
-                        fontSize = 48.sp
-                    )
-                }
-            }
-
-            // Dimensions
-            Text(
-                text = item.dimensions,
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(end = 8.dp, bottom = 4.dp),
-                color = Color.White,
-                fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace
-            )
-
-            // Bottom section
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp, end = 4.dp, bottom = 8.dp, top = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = item.title,
-                        color = Color.White,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = item.location,
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 11.sp
-                    )
-                }
-
-                Box {
-                    IconButton(
-                        onClick = { showMenu = true },
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "More options",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Delete") },
-                            onClick = { showMenu = false },
-                            leadingIcon = {
-                                Icon(Icons.Default.Delete, contentDescription = null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Edit") },
-                            onClick = { showMenu = false },
-                            leadingIcon = {
-                                Icon(Icons.Default.Edit, contentDescription = null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Close") },
-                            onClick = { showMenu = false },
-                            leadingIcon = {
-                                Icon(Icons.Default.Close, contentDescription = null)
-                            }
-                        )
-                    }
                 }
             }
         }

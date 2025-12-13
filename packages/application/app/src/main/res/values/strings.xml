@@ -21,4 +21,7 @@
     <string name="or">or</string>
     <string name="fingerprint_title">Unlock galery</string>
     <string name="fingerprint_description">Use your fingerprint to unlock the galery</string>
+    <string name="change_key">change key</string>
+    <string name="drawings">drawings</string>
+    <string name="app_themes">app themes</string>
 </resources>

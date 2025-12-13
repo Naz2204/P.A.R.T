@@ -6,9 +6,6 @@ import kotlinx.serialization.Serializable
 data object LoginPageData
 
 @Serializable
-data object PasswordCreationPageData
-
-@Serializable
 data object CreateArtPageData
 
 @Serializable

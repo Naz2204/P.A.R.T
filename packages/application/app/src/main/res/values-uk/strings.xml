@@ -21,4 +21,7 @@
     <string name="or">або</string>
     <string name="fingerprint_title">Розблокувати галерею</string>
     <string name="fingerprint_description">Використайте відбиток пяльця, щоб розблокувати галерею</string>
+    <string name="change_key">змінити ключ</string>
+    <string name="drawings">рисунки</string>
+    <string name="app_themes">теми програми</string>
 </resources>

@@ -50,10 +50,12 @@ import ua.ipze.kpi.part.views.PasswordViewModel
 import ua.ipze.kpi.part.views.localizedStringResource
 import ua.ipze.kpi.part.pages.login.fragments.PasswordInput
 import ua.ipze.kpi.part.router.GalleryPageData
+import ua.ipze.kpi.part.router.LoginPageData
 import ua.ipze.kpi.part.ui.theme.topBottomBorder
 
 @Composable
 fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
+    var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
@@ -120,8 +122,8 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
                     ) {
                         PasswordInput(
                             label = localizedStringResource(R.string.password),
-                            value = passwordViewModel.passwordInput,
-                            onValueChange = {passwordViewModel.passwordInput = it},
+                            value = password,
+                            onValueChange = {password = it},
                             placeholder = "",
                             borderColor = if (showError) listOf(Color(0xffe53e2e), Color(0xff9e5f59))
                             else listOf(Color(0xffedb768), Color(0xff987d55))
@@ -143,10 +145,10 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
                         Box(modifier = Modifier
                             .topBottomBorder(4.dp, Color(0xffedb768), Color.Transparent)
                             .clickable(onClick = {
-                                if (passwordViewModel.passwordInput == repeatPassword) {
+                                if (password == repeatPassword) {
                                     showError = false
+                                    passwordViewModel.passwordInput = password
                                     passwordViewModel.createPass()
-                                    data.nav.navigate(GalleryPageData)
                                 } else {
                                     showError = true
                                 }

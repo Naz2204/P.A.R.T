@@ -62,6 +62,7 @@ import ua.ipze.kpi.part.views.localizedStringResource
 
 @Composable
 fun LoginPage(passwordViewModel: PasswordViewModel, promptManager: Biometry) {
+    var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
@@ -134,9 +135,9 @@ fun LoginPage(passwordViewModel: PasswordViewModel, promptManager: Biometry) {
                     ) {
                         PasswordInput(
                             label = localizedStringResource(R.string.password),
-                            value = passwordViewModel.passwordInput,
+                            value = password,
                             onValueChange = {
-                                passwordViewModel.passwordInput = it
+                                password = it
                                 showError = false
                             },
                             placeholder = "",
@@ -149,6 +150,7 @@ fun LoginPage(passwordViewModel: PasswordViewModel, promptManager: Biometry) {
                         Box(modifier = Modifier
                             .topBottomBorder(4.dp, Color(0xffedb768), Color.Transparent)
                             .clickable(onClick = {
+                                passwordViewModel.passwordInput = password
                                 passwordViewModel.handleLogin()
                                 if (passwordViewModel.isAuthenticated) {
                                     showError = false
