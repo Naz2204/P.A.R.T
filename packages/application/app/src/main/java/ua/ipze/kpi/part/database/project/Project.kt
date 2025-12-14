@@ -13,7 +13,9 @@ data class Project(
     val name: String,
     val lastGeolocation: String,
     val lastSettlement: String,
-    val palette: PaletteList
+    val palette: PaletteList,
+    val timer: Long,
+    val lastModified: Long
 )
 
 data class LayersList(
