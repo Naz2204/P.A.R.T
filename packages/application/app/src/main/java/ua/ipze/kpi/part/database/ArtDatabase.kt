@@ -11,10 +11,11 @@ import ua.ipze.kpi.part.database.project.ProjectDao
 
 @Database(
     entities = [Project::class, Layer::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 @TypeConverters(Converters::class)
-abstract class ArtDatabase: RoomDatabase() {
+abstract class ArtDatabase : RoomDatabase() {
 
     abstract val layerDao: LayerDao
 
