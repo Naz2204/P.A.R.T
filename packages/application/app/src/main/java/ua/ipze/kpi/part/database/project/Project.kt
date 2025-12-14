@@ -21,6 +21,7 @@ data class Project(
 data class LayersList(
     val layersList : List<Int>,
 )
+
 data class PaletteList(
     val paletteList: List<Long>
 )

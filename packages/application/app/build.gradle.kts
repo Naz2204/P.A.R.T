@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.serialization)
     alias(libs.plugins.ksp)
+
 //    id("com.google.devtools.ksp") version
 }
 
@@ -73,6 +74,14 @@ dependencies {
     implementation(libs.androidx.core)
     implementation(libs.androidx.room)
     implementation(libs.google.gson)
+    implementation(libs.okhttp)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.google.zxing)
+    implementation(libs.zxing.android.embedded)
+    implementation("androidx.concurrent:concurrent-futures-ktx:1.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
     ksp(libs.androidx.room.compiler)
 }
