@@ -12,4 +12,8 @@ data object CreateArtPageData
 data object GalleryPageData
 
 @Serializable
-data object EditorPageData
+data class EditorPageData (
+    val drawingHeightPixels: Int,
+    val drawingWidthPixels: Int,
+    val historyLength: Int
+)
