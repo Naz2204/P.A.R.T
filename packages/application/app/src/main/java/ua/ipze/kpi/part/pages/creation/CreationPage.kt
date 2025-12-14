@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ua.ipze.kpi.part.R
+import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.views.LanguageViewModel
 import ua.ipze.kpi.part.views.localizedStringResource
 import ua.ipze.kpi.part.ui.theme.pixelBorder
@@ -47,6 +48,8 @@ import ua.ipze.kpi.part.widgets.inputs.DropdownSelector
 
 @Composable
 fun CreationPage(languageViewModel: LanguageViewModel) {
+
+    val data = BasePageDataProvider.current
 
     val possibleBackgrounds: List<Long> = listOf(0xffffffff, 0xffff0000, 0xff00ff00, 0xff0000ff)
 
@@ -68,14 +71,14 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
         .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-        Text(text = localizedStringResource(R.string.app_name, viewModel=languageViewModel), color = Color(0xffffffff),
+        Text(text = localizedStringResource(R.string.app_name, data.language), color = Color(0xffffffff),
             textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(), fontSize = 20.sp)
 
-        Text(text = localizedStringResource(R.string.new_art, viewModel=languageViewModel), fontSize = 30.sp, color = Color(0xffffffff),
+        Text(text = localizedStringResource(R.string.new_art, data.language), fontSize = 30.sp, color = Color(0xffffffff),
             textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
 
         Column() {
-            Text(text = localizedStringResource(R.string.name, viewModel=languageViewModel), fontSize = 20.sp, color = Color(0xffffffff),
+            Text(text = localizedStringResource(R.string.name, data.language), fontSize = 20.sp, color = Color(0xffffffff),
                 modifier = Modifier.padding(start = 4.dp))
             BasicTextField(value = name, onValueChange = { name = it },
                 modifier = Modifier
@@ -88,7 +91,7 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
                 textStyle = TextStyle(color = Color(0xffffffff)))
         }
         Column() {
-            Text(text = localizedStringResource(R.string.size, viewModel=languageViewModel), fontSize = 20.sp, color = Color(0xffffffff),
+            Text(text = localizedStringResource(R.string.size, data.language), fontSize = 20.sp, color = Color(0xffffffff),
                 modifier = Modifier.padding(start = 4.dp))
             Row(horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
                 BasicTextField(
@@ -121,7 +124,7 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
         }
 
         Column() {
-            Text(text = localizedStringResource(R.string.init_color_scheme, viewModel=languageViewModel), fontSize = 20.sp, color = Color(0xffffffff),
+            Text(text = localizedStringResource(R.string.init_color_scheme, data.language), fontSize = 20.sp, color = Color(0xffffffff),
                 modifier = Modifier.padding(start = 4.dp))
             BasicTextField(value = colorScheme, onValueChange = { colorScheme = it },
                 modifier = Modifier
@@ -154,7 +157,7 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
         }
 
         Column() {
-            Text(text = localizedStringResource(R.string.init_layers_num, viewModel=languageViewModel), fontSize = 20.sp, color = Color(0xffffffff),
+            Text(text = localizedStringResource(R.string.init_layers_num, data.language), fontSize = 20.sp, color = Color(0xffffffff),
                 modifier = Modifier.padding(start = 4.dp))
             BasicTextField(
                 value = numLayers, onValueChange = { numLayers = it },
@@ -171,7 +174,7 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
         }
 
         Column() {
-            Text(text = localizedStringResource(R.string.bg_fill, viewModel=languageViewModel), fontSize = 20.sp, color = Color(0xffffffff),
+            Text(text = localizedStringResource(R.string.bg_fill, data.language), fontSize = 20.sp, color = Color(0xffffffff),
                 modifier = Modifier.padding(start = 4.dp))
             DropdownSelector(possibleBackgrounds, selectedBg, { selectedBg = it },
                 modifier = Modifier
@@ -195,7 +198,7 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
             })
 
         ) {
-            Text(text = localizedStringResource(R.string.make, viewModel=languageViewModel), color = Color(0xffffffff),
+            Text(text = localizedStringResource(R.string.make, data.language), color = Color(0xffffffff),
                 textAlign = TextAlign.Center, fontSize = 30.sp,
                 modifier = Modifier
                     .fillMaxWidth()

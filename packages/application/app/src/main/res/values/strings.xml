@@ -24,4 +24,6 @@
     <string name="change_key">change key</string>
     <string name="drawings">drawings</string>
     <string name="app_themes">app themes</string>
+    <string name="create">CREATE</string>
+    <string name="turtle" translatable="false">for real turtles</string>
 </resources>

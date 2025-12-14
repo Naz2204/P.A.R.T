@@ -73,13 +73,13 @@ fun GalleryPage(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = localizedStringResource(R.string.app_name),
+                    text = localizedStringResource(R.string.app_name, data.language),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                 )
                 Text(
-                    text = "for real turteles",
+                    text = localizedStringResource(R.string.turtle, data.language),
                     fontSize = 12.sp,
                     color = Color.White.copy(alpha = 0.8f)
                 )
@@ -107,7 +107,7 @@ fun GalleryPage(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        localizedStringResource(R.string.drawings),
+                        localizedStringResource(R.string.drawings, data.language),
                         color = if (selectedTab == 0) Color(0xFFE57373) else Color(0xffffffff),
                         fontSize = 12.sp
                     )
@@ -127,7 +127,7 @@ fun GalleryPage(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        localizedStringResource(R.string.app_themes),
+                        localizedStringResource(R.string.app_themes, data.language),
                         color = if (selectedTab == 1) Color(0xFFE57373) else Color(0xffffffff),
                         fontSize = 12.sp
                     )
@@ -148,7 +148,7 @@ fun GalleryPage(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        localizedStringResource(R.string.change_key),
+                        localizedStringResource(R.string.change_key, data.language),
                         color = Color(0xffffffff),
                         fontSize = 12.sp
                     )

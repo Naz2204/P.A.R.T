@@ -33,12 +33,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ua.ipze.kpi.part.R
 import ua.ipze.kpi.part.pages.gallery.ArtItem
+import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 
 
 @Composable
 fun ArtCard(item: ArtItem, onCardClick: (ArtItem) -> Unit = {}) {
     var showMenu by remember { mutableStateOf(false) }
-
+    val data = BasePageDataProvider.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -143,7 +144,7 @@ fun ArtCard(item: ArtItem, onCardClick: (ArtItem) -> Unit = {}) {
                             painter = painterResource(R.drawable.pen_tool_icon),
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }

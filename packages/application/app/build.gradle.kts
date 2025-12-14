@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.ksp)
+//    id("com.google.devtools.ksp") version
 }
 
 android {
@@ -66,4 +68,10 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.security)
     implementation(libs.google.material)
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.room)
+
+    ksp(libs.androidx.room.compiler)
 }

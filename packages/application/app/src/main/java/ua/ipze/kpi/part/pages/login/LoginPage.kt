@@ -97,7 +97,7 @@ fun LoginPage(passwordViewModel: PasswordViewModel, promptManager: Biometry) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = localizedStringResource(R.string.app_name),
+                    text = localizedStringResource(R.string.app_name, data.language),
                     fontSize = 62.sp,
                     color = Color(0xffffffff),
                     letterSpacing = 10.sp
@@ -122,7 +122,7 @@ fun LoginPage(passwordViewModel: PasswordViewModel, promptManager: Biometry) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = localizedStringResource(R.string.login),
+                        text = localizedStringResource(R.string.login, data.language),
                         color = Color(0xFFFEF3C7),
                         fontSize = 25.sp,
                         letterSpacing = 6.sp,
@@ -134,7 +134,7 @@ fun LoginPage(passwordViewModel: PasswordViewModel, promptManager: Biometry) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         PasswordInput(
-                            label = localizedStringResource(R.string.password),
+                            label = localizedStringResource(R.string.password, data.language),
                             value = password,
                             onValueChange = {
                                 password = it
@@ -163,7 +163,7 @@ fun LoginPage(passwordViewModel: PasswordViewModel, promptManager: Biometry) {
                                 colors = listOf(Color(0x03edb768), Color(0x99edb768), Color(0x03edb768))
                             ))
                         ) {
-                            Text(text = localizedStringResource(R.string.run), color = Color(0xffffffff),
+                            Text(text = localizedStringResource(R.string.run, data.language), color = Color(0xffffffff),
                                 textAlign = TextAlign.Center, fontSize = 30.sp,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -184,7 +184,7 @@ fun LoginPage(passwordViewModel: PasswordViewModel, promptManager: Biometry) {
                                     .background(Color(0xffffffff))
                             )
                             Text(
-                                text = localizedStringResource(R.string.or),
+                                text = localizedStringResource(R.string.or, data.language),
                                 color = Color(0xFFCBD5E1),
                                 fontSize = 20.sp,
                                 modifier = Modifier.padding(horizontal = 18.dp)
@@ -212,8 +212,8 @@ fun LoginPage(passwordViewModel: PasswordViewModel, promptManager: Biometry) {
                             }
                         }
 
-                        val bioTitle = localizedStringResource(R.string.fingerprint_title)
-                        val bioDesc = localizedStringResource(R.string.fingerprint_description)
+                        val bioTitle = localizedStringResource(R.string.fingerprint_title, data.language)
+                        val bioDesc = localizedStringResource(R.string.fingerprint_description, data.language)
                         IconButton(onClick = {
                             promptManager.showBiometricPrompt(title = bioTitle, description = bioDesc)
                             biometricResult?.let { result ->

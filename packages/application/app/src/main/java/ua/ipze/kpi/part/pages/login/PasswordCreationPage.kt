@@ -109,7 +109,7 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = localizedStringResource(R.string.make_password),
+                        text = localizedStringResource(R.string.make_password, data.language),
                         color = Color(0xFFFEF3C7),
                         fontSize = 25.sp,
                         letterSpacing = 6.sp,
@@ -121,7 +121,7 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         PasswordInput(
-                            label = localizedStringResource(R.string.password),
+                            label = localizedStringResource(R.string.password, data.language),
                             value = password,
                             onValueChange = {password = it},
                             placeholder = "",
@@ -132,7 +132,7 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
                         Spacer(modifier = Modifier.height(40.dp))
 
                         PasswordInput(
-                            label = localizedStringResource(R.string.repeat),
+                            label = localizedStringResource(R.string.repeat, data.language),
                             value = repeatPassword,
                             onValueChange = {repeatPassword = it},
                             placeholder = "",
@@ -157,7 +157,7 @@ fun PasswordCreationPage(passwordViewModel: PasswordViewModel) {
                                 colors = listOf(Color(0x03edb768), Color(0x99edb768), Color(0x03edb768))
                             ))
                         ) {
-                            Text(text = localizedStringResource(R.string.run), color = Color(0xffffffff),
+                            Text(text = localizedStringResource(R.string.create, data.language), color = Color(0xffffffff),
                                 textAlign = TextAlign.Center, fontSize = 30.sp,
                                 modifier = Modifier
                                     .fillMaxWidth()
