@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.core)
     implementation(libs.androidx.room)
+    implementation(libs.google.gson)
 
     ksp(libs.androidx.room.compiler)
 }

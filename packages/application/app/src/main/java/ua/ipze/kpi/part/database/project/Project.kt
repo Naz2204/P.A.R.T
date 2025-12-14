@@ -7,11 +7,18 @@ import androidx.room.PrimaryKey
 data class Project(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val layers : List<Int>,
+    val layers : LayersList,
     val width: Int,
     val height: Int,
     val name: String,
     val lastGeolocation: String,
     val lastSettlement: String,
-    val palette: List<Long>
+    val palette: PaletteList
+)
+
+data class LayersList(
+    val layersList : List<Int>,
+)
+data class PaletteList(
+    val paletteList: List<Long>
 )

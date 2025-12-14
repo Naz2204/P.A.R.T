@@ -29,7 +29,7 @@ fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel,
 
     CompositionLocalProvider(BasePageDataProvider provides basicPageData) {
         NavHost(
-            navController = navController, startDestination = GalleryPageData,
+            navController = navController, startDestination = EditorPageData,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
