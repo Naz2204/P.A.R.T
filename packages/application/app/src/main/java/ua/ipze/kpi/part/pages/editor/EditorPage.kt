@@ -1,6 +1,5 @@
 package ua.ipze.kpi.part.pages.editor
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -21,6 +20,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -38,16 +37,25 @@ import ua.ipze.kpi.part.pages.editor.fragments.ColorPalette
 import ua.ipze.kpi.part.pages.editor.fragments.LayersPanel
 import ua.ipze.kpi.part.pages.editor.fragments.MenuDialog
 import ua.ipze.kpi.part.pages.editor.fragments.TopToolbar
+import ua.ipze.kpi.part.services.drawing.DrawCanvas
+import ua.ipze.kpi.part.services.drawing.view.IDrawingViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorPage() {
+fun EditorPage(drawingViewModel: IDrawingViewModel) {
     var showMenu by remember { mutableStateOf(false) }
     var showColorPalette by remember { mutableStateOf(false) }
     var showLayers by remember { mutableStateOf(false) }
     var layerHidden by remember { mutableStateOf(false) }
     var selectedTool by remember { mutableStateOf(0) }
     var selectedColor by remember { mutableStateOf(Color(0xFFFFEB3B)) }
+
+    DisposableEffect(Unit) {
+        drawingViewModel.setGestureHandler {
+            print("New gesture")
+        }
+        onDispose { drawingViewModel.setGestureHandler(null) }
+    }
 
     val colors = listOf(
         Color.White, Color.Black,
@@ -83,8 +91,11 @@ fun EditorPage() {
             },
             floatingActionButton = {
                 FloatingActionButton(onClick = { showColorPalette = !showColorPalette }) {
-                    Icon(painter = painterResource(R.drawable.color_selector_icon), contentDescription = "Add",
-                        tint = selectedColor)
+                    Icon(
+                        painter = painterResource(R.drawable.color_selector_icon),
+                        contentDescription = "Add",
+                        tint = selectedColor
+                    )
                 }
             },
             containerColor = Color(0xFF424242),
@@ -96,7 +107,7 @@ fun EditorPage() {
                     .padding(paddingValues)
                     .background(Color(0xFF616161))
             ) {
-                PixelCanvas(modifier = Modifier.fillMaxSize())
+                DrawCanvas(drawingViewModel, Modifier.fillMaxSize())
 
                 Box(
                     modifier = Modifier
@@ -109,7 +120,7 @@ fun EditorPage() {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Tool",
+                        contentDescription = null,
                         tint = selectedColor,
                         modifier = Modifier.size(24.dp)
                     )
@@ -161,53 +172,3 @@ fun EditorPage() {
 
 
 
-@Composable
-fun PixelCanvas(modifier: Modifier = Modifier) {
-    val gridSize = 10
-    val cellsPerRow = 18
-    val cellsPerColumn = 70
-
-    Canvas(modifier = modifier) {
-        val cellWidth = size.width / cellsPerRow
-        val cellHeight = size.height / cellsPerColumn
-
-        // Draw grid
-        for (i in 0..cellsPerRow) {
-            drawLine(
-                color = Color(0xFF757575),
-                start = Offset(i * cellWidth, 0f),
-                end = Offset(i * cellWidth, size.height),
-                strokeWidth = 1f
-            )
-        }
-
-        for (i in 0..cellsPerColumn) {
-            drawLine(
-                color = Color(0xFF757575),
-                start = Offset(0f, i * cellHeight),
-                end = Offset(size.width, i * cellHeight),
-                strokeWidth = 1f
-            )
-        }
-
-        // Draw some example pixels (checkerboard pattern)
-        for (row in 0 until cellsPerColumn) {
-            for (col in 0 until cellsPerRow) {
-                val isGray = (row + col) % 2 == 0
-                if (isGray) {
-                    drawRect(
-                        color = Color(0xFF9E9E9E),
-                        topLeft = Offset(col * cellWidth, row * cellHeight),
-                        size = androidx.compose.ui.geometry.Size(cellWidth, cellHeight)
-                    )
-                } else {
-                    drawRect(
-                        color = Color(0xFFBDBDBD),
-                        topLeft = Offset(col * cellWidth, row * cellHeight),
-                        size = androidx.compose.ui.geometry.Size(cellWidth, cellHeight)
-                    )
-                }
-            }
-        }
-    }
-}
