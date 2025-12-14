@@ -19,6 +19,7 @@ abstract class IDrawingViewModel() : ViewModel() {
         heightAmountPixels: UInt,
         pixelsPerPixelCell: UInt,
     )
+
     
     // line drawing
     /**
