@@ -20,9 +20,6 @@ abstract class IDrawingViewModel() : ViewModel() {
         pixelsPerPixelCell: UInt,
     )
 
-    abstract fun setGestureHandler(handler: (() -> Unit)?)
-
-
     // line drawing
     /**
      * if start == end - draws one pixel
