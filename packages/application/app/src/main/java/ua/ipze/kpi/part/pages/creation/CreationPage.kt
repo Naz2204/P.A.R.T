@@ -246,8 +246,11 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(15.dp)
             ) {
                 ScanQrButton { qrJson ->
-                    val jsonArray = JSONObject(qrJson)
-                    colorScheme = jsonToColors(jsonArray["colors"].toString())
+                    try {
+                        val jsonArray = JSONObject(qrJson)
+                        colorScheme = jsonToColors(jsonArray["colors"].toString())
+                    } catch (t: Throwable) {
+                    }
                 }
 
                 IconButton(

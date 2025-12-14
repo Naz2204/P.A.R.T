@@ -20,6 +20,7 @@ abstract class IDrawingViewModel() : ViewModel() {
         pixelsPerPixelCell: UInt,
     )
 
+    
     // line drawing
     /**
      * if start == end - draws one pixel
