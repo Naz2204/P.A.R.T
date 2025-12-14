@@ -55,20 +55,20 @@ private fun screenToBitmap(
 
 @Composable
 fun DrawCanvas(
-    view: IDrawingViewModel,
     modifier: Modifier = Modifier,
+    view: IDrawingViewModel,
+    handleDrawLine: (start: Offset, end: Offset) -> Unit
 ) {
 
     val image = view.rememberImage()
     val lastBitmapPos = remember { mutableStateOf(Offset.Zero) }
-    val currentColor = Color.Black
     val scaling = remember { mutableFloatStateOf(1f) }
 
     Canvas(
         modifier = modifier
             .border(width = 2.dp, color = Color.Blue)
             .pointerInput(Unit) {
-                drawAndPanPointerInput(lastBitmapPos, scaling, image, view, currentColor)
+                drawAndPanPointerInput(lastBitmapPos, scaling, image, handleDrawLine)
             }) {
         drawImage(
             image = image,
@@ -90,8 +90,7 @@ suspend fun PointerInputScope.drawAndPanPointerInput(
     canvasOffset: MutableState<Offset>,
     scaling: MutableState<Float>,
     image: ImageBitmap,
-    view: IDrawingViewModel,
-    currentColor: Color
+    handleDrawLine: (start: Offset, end: Offset) -> Unit
 ) {
     awaitPointerEventScope {
         var isDrawing = false
@@ -117,10 +116,9 @@ suspend fun PointerInputScope.drawAndPanPointerInput(
                             lastBitmapPos = bitmapPos.lastValidOffset.toOffset()
 
                             if (isDrawing) {
-                                view.drawLine(
+                                handleDrawLine(
                                     lastBitmapPos,
-                                    lastBitmapPos,
-                                    currentColor
+                                    lastBitmapPos
                                 )
                             }
                         }
@@ -137,10 +135,9 @@ suspend fun PointerInputScope.drawAndPanPointerInput(
                             isDrawing = !bitmapPos.isOvershot
 
                             if ((isDrawing || wasDrawing) && lastBitmapPos != null) {
-                                view.drawLine(
+                                handleDrawLine(
                                     lastBitmapPos,
-                                    bitmapPos.lastValidOffset.toOffset(),
-                                    currentColor
+                                    bitmapPos.lastValidOffset.toOffset()
                                 )
                             }
                             lastBitmapPos = bitmapPos.lastValidOffset.toOffset()

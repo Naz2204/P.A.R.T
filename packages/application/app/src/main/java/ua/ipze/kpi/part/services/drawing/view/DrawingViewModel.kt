@@ -48,10 +48,6 @@ class DrawingViewModel() :
         this.pixelsPerPixelCell = pixelsPerPixelCell
     }
 
-    override fun setGestureHandler(handler: (() -> Unit)?) {
-        this.handleGesture = handler ?: {}
-    }
-
     // ----------------------------------------------------
     // data
 
@@ -62,7 +58,6 @@ class DrawingViewModel() :
     private var widthAmountPixels: UInt = 0u
     private var heightAmountPixels: UInt = 0u
     private var pixelsPerPixelCell: UInt = 0u
-    private var handleGesture: () -> Unit = {}
 
     // ----------------------------------------------------
 
