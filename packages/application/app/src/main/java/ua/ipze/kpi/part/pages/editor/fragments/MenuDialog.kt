@@ -1,6 +1,5 @@
 package ua.ipze.kpi.part.pages.editor.fragments
 
-import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,14 +20,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import ua.ipze.kpi.part.R
+import ua.ipze.kpi.part.providers.MainActivityDataProvider
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.router.GalleryPageData
 import ua.ipze.kpi.part.ui.theme.topBottomBorder
@@ -37,6 +35,7 @@ import ua.ipze.kpi.part.views.localizedStringResource
 @Composable
 fun MenuDialog(onDismiss: () -> Unit) {
     val data = BasePageDataProvider.current
+    val activity = MainActivityDataProvider.current
     var language by remember { mutableStateOf("en") }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -47,7 +46,7 @@ fun MenuDialog(onDismiss: () -> Unit) {
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(30.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -84,7 +83,7 @@ fun MenuDialog(onDismiss: () -> Unit) {
                 ){
                     Text(
                         text = localizedStringResource(R.string.export, data.language),
-                        color = Color.White,
+                        color = Color(0xffffffff),
                         fontSize = 16.sp,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -102,13 +101,13 @@ fun MenuDialog(onDismiss: () -> Unit) {
                 ) {
                     Text(
                         text = localizedStringResource(R.string.projects, data.language),
-                        color = Color.White,
+                        color = Color(0xffffffff),
                         fontSize = 16.sp,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
 
-                Column (
+                Row (
                     modifier = Modifier
 //                        .fillMaxWidth()
                         .clickable {
@@ -121,29 +120,34 @@ fun MenuDialog(onDismiss: () -> Unit) {
                             data.language.setAppLanguage(language)
                         }
                         .topBottomBorder(strokeWidth = 4.dp, borderColor = Color(0xffffffff), backgroundColor = Color.Transparent)
-                        .padding(vertical = 10.dp)
+                        .padding(vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Text(
                         text = localizedStringResource(R.string.language, data.language),
-                        color = Color.White,
+                        color = Color(0xffffffff),
                         fontSize = 16.sp,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.weight(0.9f)
+                    )
+                    Text(
+                        text = language.uppercase(),
+                        color = Color(0xffffffff),
+                        fontSize = 16.sp,
+                        modifier = Modifier.weight(0.1f)
                     )
                 }
-                val activity = (LocalContext.current as? Activity)
                 Column (
                     modifier = Modifier
-//                        .fillMaxWidth()
                         .clickable {
-//                            TODO("Додати збереження перед виходом")
-                            activity?.finish()
+                            TODO("Додати збереження перед виходом")
+                            activity.activity.finish()
                         }
                         .topBottomBorder(strokeWidth = 4.dp, borderColor = Color(0xffffffff), backgroundColor = Color.Transparent)
                         .padding(vertical = 10.dp)
                 ){
                     Text(
                         text = localizedStringResource(R.string.exit, data.language),
-                        color = Color.White,
+                        color = Color(0xffffffff),
                         fontSize = 16.sp,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -153,7 +157,6 @@ fun MenuDialog(onDismiss: () -> Unit) {
                     text = "Lviv, Ukraine",
                     color = Color(0xFF9E9E9E),
                     fontSize = 12.sp,
-                    fontFamily = FontFamily.Monospace,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }

@@ -5,11 +5,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ua.ipze.kpi.part.providers.MainActivityData
+import ua.ipze.kpi.part.providers.MainActivityDataProvider
+import ua.ipze.kpi.part.providers.basePageData.BasePageData
 import ua.ipze.kpi.part.views.LanguageViewModel
 import ua.ipze.kpi.part.router.AppRouter
 import ua.ipze.kpi.part.ui.theme.PARTTheme
@@ -33,10 +38,13 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val languageViewModel: LanguageViewModel = viewModel()
             val passwordViewModel: PasswordViewModel = viewModel()
+            val mainActivityData = remember { MainActivityData(this)}
 
-            PARTTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppRouter(innerPadding, languageViewModel, passwordViewModel, promptManager)
+            CompositionLocalProvider(MainActivityDataProvider provides mainActivityData) {
+                PARTTheme {
+                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                        AppRouter(innerPadding, languageViewModel, passwordViewModel, promptManager)
+                    }
                 }
             }
         }
