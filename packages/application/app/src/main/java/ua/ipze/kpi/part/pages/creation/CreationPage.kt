@@ -1,6 +1,5 @@
 package ua.ipze.kpi.part.pages.creation
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -33,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toColorLong
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,8 +40,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import org.json.JSONObject
 import ua.ipze.kpi.part.R
+import ua.ipze.kpi.part.database.layer.Layer
+import ua.ipze.kpi.part.database.project.LayersList
+import ua.ipze.kpi.part.database.project.PaletteList
+import ua.ipze.kpi.part.database.project.Project
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.services.paletteApi.PaletteViewModel
 import ua.ipze.kpi.part.services.qrWorker.QRDialog
@@ -49,16 +57,16 @@ import ua.ipze.kpi.part.services.qrWorker.ScanQrButton
 import ua.ipze.kpi.part.services.qrWorker.jsonToColors
 import ua.ipze.kpi.part.ui.theme.pixelBorder
 import ua.ipze.kpi.part.ui.theme.topBottomBorder
-import ua.ipze.kpi.part.views.LanguageViewModel
 import ua.ipze.kpi.part.views.localizedStringResource
 import ua.ipze.kpi.part.widgets.inputs.DropdownSelector
 
 @Composable
-fun CreationPage(languageViewModel: LanguageViewModel) {
+fun CreationPage() {
 
     val data = BasePageDataProvider.current
     val paletteViewModel: PaletteViewModel = viewModel()
 
+    //TODO можливо замінити випадаюче меню на меню вибору кольору
     val possibleBackgrounds: List<Long> = listOf(0xffffffff, 0xffff0000, 0xff00ff00, 0xff0000ff)
 
     val scrollStateV = rememberScrollState()
@@ -248,14 +256,6 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
                         tint = Color(0xff232323)
                     )
                 }
-//                IconButton(onClick = {
-//                    TODO("Додати скан NFC")
-//                }, modifier = Modifier.background(Color.LightGray).size(30.dp)) {
-//                    Image(
-//                        painter = painterResource(R.drawable.nfc_icon),
-//                        contentDescription = null,
-//                    )
-//                }
             }
         }
 
@@ -304,9 +304,37 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
             modifier = Modifier
                 .topBottomBorder(4.dp, Color(0xffffffff), Color(0xff53565A))
                 .clickable(onClick = {
-                    languageViewModel.setAppLanguage("en")
-                    Log.d("ButtonTest", "Button clicked")
-//                TODO("Додати створення проєкту і перехід на сторінку редактора")
+
+                    val now = Clock.System.now()
+                    val localDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
+                    val epochTime = localDateTime.toInstant(TimeZone.currentSystemDefault())
+                        .toEpochMilliseconds()
+
+                    val listLayer = List(numLayers.toIntOrNull() ?: 1) {
+                        Layer(
+                            name = "",
+                            visibility = true,
+                            lock = false,
+                            imageData = ByteArray(
+                                ((width.toIntOrNull() ?: 1) * (height.toIntOrNull() ?: 1))
+                            )
+                        )
+                    }
+                    val project = Project(
+                        layers = LayersList(emptyList()),
+                        width = width.toIntOrNull() ?: 1,
+                        height = height.toIntOrNull() ?: 1,
+                        name = name,
+                        //TODO додати геолокацію
+                        lastGeolocation = "",
+                        lastSettlement = "",
+                        palette = PaletteList(colorScheme.map { it ->
+                            Color(it[0], it[1], it[2]).toColorLong()
+                        }),
+                        timer = 0,
+                        lastModified = epochTime,
+                    )
+                    data.databaseViewModel.saveProject(project, listLayer)
                 })
 
         ) {

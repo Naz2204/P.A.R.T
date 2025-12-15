@@ -63,8 +63,9 @@ class DatabaseViewModel : ViewModel() {
         viewModelScope.launch {
             artDao.withTransaction {
                 val layerIds = layers.map { layer -> artDao.layerDao.upsertLayer(layer) }
-                project.copy(layers = LayersList(layersList = layerIds))
-                artDao.projectDao.upsertProject(project)
+                artDao.projectDao.upsertProject(
+                    project.copy(layers = LayersList(layersList = layerIds))
+                )
             }
         }
     }

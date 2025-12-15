@@ -48,7 +48,7 @@ fun EditorPage(drawingViewModel: IDrawingViewModel) {
     var showColorPalette by remember { mutableStateOf(false) }
     var showLayers by remember { mutableStateOf(false) }
     var layerHidden by remember { mutableStateOf(false) }
-    var selectedTool by remember { mutableStateOf(0) }
+    var selectedTool by remember { mutableStateOf(4) }
     var selectedColor by remember { mutableStateOf(Color(0xFFFFEB3B)) }
 
     var colors by remember {

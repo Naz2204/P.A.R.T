@@ -39,11 +39,12 @@ fun AppRouter(
     CompositionLocalProvider(BasePageDataProvider provides basicPageData) {
         NavHost(
             navController = navController,
-            startDestination = EditorPageData(
-                drawingWidthPixels = 500,
-                drawingHeightPixels = 500,
-                historyLength = 1
-            ),
+//            startDestination = EditorPageData(
+//                drawingWidthPixels = 500,
+//                drawingHeightPixels = 500,
+//                historyLength = 1
+//            ),
+            startDestination = CreateArtPageData,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -74,7 +75,7 @@ fun AppRouter(
                 else PasswordCreationPage(passwordViewModel)
             }
             //            composable<LoginPageData> { LoginPage(passwordViewModel, promptManager) }
-            composable<CreateArtPageData> { CreationPage(languageViewModel) }
+            composable<CreateArtPageData> { CreationPage() }
             composable<GalleryPageData> { GalleryPage(passwordViewModel) }
             composable<EditorPageData> {
                 val data = it.toRoute<EditorPageData>()
