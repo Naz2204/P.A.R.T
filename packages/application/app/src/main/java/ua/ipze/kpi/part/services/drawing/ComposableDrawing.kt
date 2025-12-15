@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.toSize
 import ua.ipze.kpi.part.services.drawing.view.IDrawingViewModel
 
 @Composable
-fun IDrawingViewModel.rememberImage(): ImageBitmap {
+private fun IDrawingViewModel.rememberImage(): List<ImageBitmap> {
     val changed by this.__INTERNAL_bitmapVersion.collectAsState()
     return remember(changed) { this.__INTERNAL_getCachedBitmapImage() }
 }
@@ -64,49 +64,54 @@ fun DrawCanvas(
     handleDrawLine: (start: Offset, end: Offset) -> Unit
 ) {
 
-    val image = view.rememberImage()
+    val images = view.rememberImage()
     val scaling = remember { mutableFloatStateOf(1f) }
     val lastBitmapPos = remember { mutableStateOf(Offset.Zero) }
     var wasCentered by remember { mutableStateOf(false) }
     var canvasSize by remember { mutableStateOf(Size(1f, 1f)) }
 
+    if (images.isEmpty()) return
+    val anyImage = images[0]
+
     Canvas(
         modifier = modifier
             .clipToBounds()
             .pointerInput(Unit) {
-                drawAndPanPointerInput(lastBitmapPos, scaling, image, canvasSize, handleDrawLine)
+                drawAndPanPointerInput(lastBitmapPos, scaling, anyImage, canvasSize, handleDrawLine)
             }
             .onSizeChanged {
                 canvasSize = it.toSize()
                 if (wasCentered) return@onSizeChanged
-                wasCentered = true
+                wasCentered = true // correct code, ignore linter
 
-                val scaleX = it.width.toFloat() / image.width
-                val scaleY = it.height.toFloat() / image.height
+                val scaleX = it.width.toFloat() / anyImage.width
+                val scaleY = it.height.toFloat() / anyImage.height
                 scaling.floatValue = minOf(scaleX, scaleY)
 
-                val scaledWidth = image.width * scaling.floatValue
-                val scaledHeight = image.height * scaling.floatValue
+                val scaledWidth = anyImage.width * scaling.floatValue
+                val scaledHeight = anyImage.height * scaling.floatValue
                 lastBitmapPos.value = Offset(
                     x = (it.width - scaledWidth) / 2f,
                     y = (it.height - scaledHeight) / 2f
                 )
             }
     ) {
-        drawImage(
-            image = image,
-            srcOffset = IntOffset.Zero,
-            srcSize = IntSize(
-                image.width,
-                image.height
-            ),
-            dstOffset = IntOffset(lastBitmapPos.value.x.toInt(), lastBitmapPos.value.y.toInt()),
-            dstSize = IntSize(
-                (image.width * scaling.floatValue).toInt(),
-                (image.height * scaling.floatValue).toInt()
-            ),
-            filterQuality = FilterQuality.None
-        )
+        images.asReversed().forEach {
+            drawImage(
+                image = it,
+                srcOffset = IntOffset.Zero,
+                srcSize = IntSize(
+                    anyImage.width,
+                    anyImage.height
+                ),
+                dstOffset = IntOffset(lastBitmapPos.value.x.toInt(), lastBitmapPos.value.y.toInt()),
+                dstSize = IntSize(
+                    (anyImage.width * scaling.floatValue).toInt(),
+                    (anyImage.height * scaling.floatValue).toInt()
+                ),
+                filterQuality = FilterQuality.None
+            )
+        }
     }
 }
 
