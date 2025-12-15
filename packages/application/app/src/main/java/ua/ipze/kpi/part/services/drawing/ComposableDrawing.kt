@@ -1,7 +1,6 @@
 package ua.ipze.kpi.part.services.drawing
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -9,13 +8,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -61,15 +61,31 @@ fun DrawCanvas(
 ) {
 
     val image = view.rememberImage()
-    val lastBitmapPos = remember { mutableStateOf(Offset.Zero) }
     val scaling = remember { mutableFloatStateOf(1f) }
+    val lastBitmapPos = remember { mutableStateOf(Offset.Zero) }
+    var wasCentered by remember { mutableStateOf(false) }
 
     Canvas(
         modifier = modifier
-            .border(width = 2.dp, color = Color.Blue)
             .pointerInput(Unit) {
                 drawAndPanPointerInput(lastBitmapPos, scaling, image, handleDrawLine)
-            }) {
+            }
+            .onSizeChanged {
+                if (wasCentered) return@onSizeChanged
+                wasCentered = true
+
+                val scaleX = it.width.toFloat() / image.width
+                val scaleY = it.height.toFloat() / image.height
+                scaling.floatValue = minOf(scaleX, scaleY)
+
+                val scaledWidth = image.width * scaling.floatValue
+                val scaledHeight = image.height * scaling.floatValue
+                lastBitmapPos.value = Offset(
+                    x = (it.width - scaledWidth) / 2f,
+                    y = (it.height - scaledHeight) / 2f
+                )
+            }
+    ) {
         drawImage(
             image = image,
             srcOffset = IntOffset.Zero,
