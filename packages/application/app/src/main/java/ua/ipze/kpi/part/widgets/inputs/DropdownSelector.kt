@@ -34,7 +34,7 @@ import ua.ipze.kpi.part.R
 @OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun DropdownSelector(
-    items: List<Long>,
+    items: List<Color>,
     selected: Int,
     onSelectedChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -50,13 +50,13 @@ fun DropdownSelector(
             horizontalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = items[selected].toHexString(HexFormat {
+                text = items[selected].value.toLong().toHexString(HexFormat {
                     upperCase = false
                     number.prefix = "#"
                     number.minLength = 8
                     number.removeLeadingZeros = true
                 }), Modifier
-                    .background(color = Color(items[selected]))
+                    .background(color = items[selected])
                     .weight(0.5f),
                 fontSize = 20.sp, textAlign = TextAlign.Center, color = Color(0xff000000)
             )
@@ -78,7 +78,7 @@ fun DropdownSelector(
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = item.toHexString(HexFormat {
+                            text = item.value.toLong().toHexString(HexFormat {
                                 upperCase = false
                                 number.prefix = "#"
                                 number.minLength = 8
@@ -95,7 +95,7 @@ fun DropdownSelector(
                         expanded = false
                     },
                     modifier = Modifier
-                        .background(color = Color(item))
+                        .background(color = item)
                         .border(2.dp, Color(0xff53565A))
                         .height(22.dp)
                 )

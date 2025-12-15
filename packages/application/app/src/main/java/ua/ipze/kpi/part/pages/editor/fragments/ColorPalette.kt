@@ -45,7 +45,6 @@ import ua.ipze.kpi.part.views.localizedStringResource
 @Composable
 fun ColorPaletteWithPicker(
     colors: List<Color>,
-    selectedColor: Color,
     onColorSelected: (Color) -> Unit,
     onColorAdded: (Color) -> Unit,
     onColorDeleted: (index: Int) -> Unit,
@@ -56,7 +55,6 @@ fun ColorPaletteWithPicker(
     Log.d("red", "redrown + ${colors.size}")
     ColorPalette(
         colors = colors,
-        selectedColor = selectedColor,
         onColorSelected = onColorSelected,
         onAddClick = { showColorPicker = true },
         onCopyClick = onColorAdded,
@@ -78,7 +76,6 @@ fun ColorPaletteWithPicker(
 @Composable
 fun ColorPalette(
     colors: List<Color>,
-    selectedColor: Color,
     onColorSelected: (Color) -> Unit,
     onAddClick: () -> Unit,
     onCopyClick: (color: Color) -> Unit,

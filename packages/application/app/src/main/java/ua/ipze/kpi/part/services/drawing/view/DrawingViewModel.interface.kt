@@ -8,20 +8,29 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.views.DatabaseViewModel
-import java.io.File
 
 data class DrawingAmountOfSteps(val backward: UInt, val forward: UInt)
+data class CurrentActiveLayer(val layer: Layer, val indexInArray: UInt)
 
 abstract class IDrawingViewModel() : ViewModel() {
     // construct
     abstract fun initialize(
         historyLength: UInt,
-        widthAmountPixels: UInt,
-        heightAmountPixels: UInt,
         pixelsPerPixelCell: UInt,
-        databaseViewModel: DatabaseViewModel
+        id: Long,
+        databaseViewModel: DatabaseViewModel,
+        closePageOnFailure: () -> Unit
     )
+
+    // data
+    abstract fun getLayers(): StateFlow<List<Layer>>
+    abstract fun getCurrentActiveLayer(): StateFlow<CurrentActiveLayer?>
+    abstract fun swapLayers(a: UInt, b: UInt)
+    abstract fun setActiveLayer(index: UInt)
+    abstract fun setVisibilityOfLayer(index: UInt, isVisible: Boolean)
+    abstract fun setLockOnLayer(index: UInt, isLocked: Boolean)
 
 
     // line drawing
@@ -54,8 +63,8 @@ abstract class IDrawingViewModel() : ViewModel() {
     abstract fun clearImage()
 
     // work with files
-    abstract fun load(file: File): Result<Unit>
-    abstract fun storeToPng(): ByteArray
+    abstract fun load(index: UInt, png: ByteArray): Result<Unit>
+    abstract fun storeToPng(index: UInt): ByteArray
 
     abstract fun getWidthAmountPixels(): UInt
 
@@ -65,7 +74,9 @@ abstract class IDrawingViewModel() : ViewModel() {
 
     // internal DON'T USE
     @Suppress("FunctionName")
-    abstract fun __INTERNAL_getCachedBitmapImage(): ImageBitmap
+    abstract fun __INTERNAL_getCachedBitmapImage(): List<ImageBitmap>
+
+    @Suppress("PropertyName")
     abstract val __INTERNAL_bitmapVersion: MutableStateFlow<UInt>
 }
 

@@ -13,6 +13,7 @@ data class Project(
     val name: String,
     val lastSettlement: String,
     val palette: PaletteList,
+    val baseColor: Long,
     val timer: Long,
     val lastModified: Long
 )

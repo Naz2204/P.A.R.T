@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             applicationContext,
             ArtDatabase::class.java,
             "art.db"
-        ).build()
+        ).fallbackToDestructiveMigration().build() // FIXME: remove
     }
 
     private val promptManager by lazy {

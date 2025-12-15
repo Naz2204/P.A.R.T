@@ -10,7 +10,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputScope
@@ -20,6 +23,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toOffset
+import androidx.compose.ui.unit.toSize
 import ua.ipze.kpi.part.services.drawing.view.IDrawingViewModel
 
 @Composable
@@ -43,7 +47,7 @@ private fun screenToBitmap(
     val yReal = ((screenPos.y - canvasOffset.y) / scaling).toInt()
 
     val xClipped = xReal.coerceIn(0, image.width - 1)
-    val yClipped = yReal.coerceIn(0, image.width - 1)
+    val yClipped = yReal.coerceIn(0, image.height - 1)
 
     return ScreenToBitmapResult(
         lastValidOffset = IntOffset(
@@ -64,13 +68,16 @@ fun DrawCanvas(
     val scaling = remember { mutableFloatStateOf(1f) }
     val lastBitmapPos = remember { mutableStateOf(Offset.Zero) }
     var wasCentered by remember { mutableStateOf(false) }
+    var canvasSize by remember { mutableStateOf(Size(1f, 1f)) }
 
     Canvas(
         modifier = modifier
+            .clipToBounds()
             .pointerInput(Unit) {
-                drawAndPanPointerInput(lastBitmapPos, scaling, image, handleDrawLine)
+                drawAndPanPointerInput(lastBitmapPos, scaling, image, canvasSize, handleDrawLine)
             }
             .onSizeChanged {
+                canvasSize = it.toSize()
                 if (wasCentered) return@onSizeChanged
                 wasCentered = true
 
@@ -97,7 +104,8 @@ fun DrawCanvas(
             dstSize = IntSize(
                 (image.width * scaling.floatValue).toInt(),
                 (image.height * scaling.floatValue).toInt()
-            )
+            ),
+            filterQuality = FilterQuality.None
         )
     }
 }
@@ -106,6 +114,7 @@ suspend fun PointerInputScope.drawAndPanPointerInput(
     canvasOffset: MutableState<Offset>,
     scaling: MutableState<Float>,
     image: ImageBitmap,
+    canvasSize: Size,
     handleDrawLine: (start: Offset, end: Offset) -> Unit
 ) {
     awaitPointerEventScope {
@@ -169,6 +178,9 @@ suspend fun PointerInputScope.drawAndPanPointerInput(
                 }
 
                 2 -> { // Two-finger pan
+                    isDrawing = false
+                    lastBitmapPos = null
+
                     val p1 = pointers[0]
                     val p2 = pointers[1]
                     p1.consume()
@@ -185,14 +197,39 @@ suspend fun PointerInputScope.drawAndPanPointerInput(
                     canvasOffset.value += delta
 
                     // Zoom: distance ratio
-                    // TODO: add zoom that persist midpoint
                     val prevDistance = (p1.previousPosition - p2.previousPosition).getDistance()
                     val currentDistance = (p1.position - p2.position).getDistance()
                     val zoomFactor = currentDistance / prevDistance
-                    scaling.value = (scaling.value * zoomFactor).coerceIn(0.1f, 10f)
+
+                    val oldScale = scaling.value
+                    scaling.value = (oldScale * zoomFactor).coerceIn(0.1f, 40f)
+                    val effectiveZoom = scaling.value / oldScale
+                    canvasOffset.value += (currentMid - canvasOffset.value) * (1 - effectiveZoom)
+
+                    // Normalizing
+                    val realWidth = image.width * scaling.value
+                    val realHeight = image.height * scaling.value
+                    val negativeMultiple = 0.8f
+                    val positiveMultiple = 1 - negativeMultiple
+
+
+                    canvasOffset.value =
+                        Offset(
+                            canvasOffset.value.x.coerceIn(
+                                -realWidth * negativeMultiple,
+                                canvasSize.width - realWidth * positiveMultiple
+                            ),
+                            canvasOffset.value.y.coerceIn(
+                                -realHeight * negativeMultiple,
+                                canvasSize.height - realHeight * positiveMultiple
+                            )
+                        )
                 }
 
-                else -> Unit
+                else -> {
+                    isDrawing = false
+                    lastBitmapPos = null
+                }
             }
         }
     }
