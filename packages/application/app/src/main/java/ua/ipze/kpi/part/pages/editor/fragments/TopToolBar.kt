@@ -96,12 +96,32 @@ fun TopToolbar(
         ) {
             IconButton(
                 onClick = {
-                    onToolSelected(0)
+                    onToolSelected(3)
                 },
                 modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     painter = painterResource(tools[3]),
+                    contentDescription = null,
+                    tint = Color(0xffffffff),
+                    modifier = Modifier
+                        .size(35.dp)
+                        .pixelBorder(
+                            borderWidth = 2.dp,
+                            innerColor = if (selectedTool == 3) Color(0xff903d39)
+                            else Color.LightGray
+                        )
+                        .padding(2.dp)
+                )
+            }
+            IconButton(
+                onClick = {
+                    onToolSelected(4)
+                },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    painter = painterResource(tools[4]),
                     contentDescription = null,
                     tint = Color(0xffffffff),
                     modifier = Modifier
@@ -116,27 +136,7 @@ fun TopToolbar(
             }
             IconButton(
                 onClick = {
-                    onToolSelected(1)
-                },
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    painter = painterResource(tools[4]),
-                    contentDescription = null,
-                    tint = Color(0xffffffff),
-                    modifier = Modifier
-                        .size(35.dp)
-                        .pixelBorder(
-                            borderWidth = 2.dp,
-                            innerColor = if (selectedTool == 5) Color(0xff903d39)
-                            else Color.LightGray
-                        )
-                        .padding(2.dp)
-                )
-            }
-            IconButton(
-                onClick = {
-                    onToolSelected(2)
+                    onToolSelected(5)
                 },
                 modifier = Modifier.size(48.dp)
             ) {
@@ -148,7 +148,7 @@ fun TopToolbar(
                         .size(35.dp)
                         .pixelBorder(
                             borderWidth = 2.dp,
-                            innerColor = if (selectedTool == 7) Color(0xff903d39)
+                            innerColor = if (selectedTool == 5) Color(0xff903d39)
                             else Color.LightGray
                         )
                         .padding(2.dp)

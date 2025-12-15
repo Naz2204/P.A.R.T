@@ -1,5 +1,6 @@
 package ua.ipze.kpi.part.pages.editor
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -33,7 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ua.ipze.kpi.part.R
 import ua.ipze.kpi.part.pages.editor.fragments.BottomBar
-import ua.ipze.kpi.part.pages.editor.fragments.ColorPalette
+import ua.ipze.kpi.part.pages.editor.fragments.ColorPaletteWithPicker
 import ua.ipze.kpi.part.pages.editor.fragments.LayersPanel
 import ua.ipze.kpi.part.pages.editor.fragments.MenuDialog
 import ua.ipze.kpi.part.pages.editor.fragments.TopToolbar
@@ -50,14 +51,29 @@ fun EditorPage(drawingViewModel: IDrawingViewModel) {
     var selectedTool by remember { mutableStateOf(0) }
     var selectedColor by remember { mutableStateOf(Color(0xFFFFEB3B)) }
 
-    val colors = listOf(
-        Color.White, Color.Black,
-        Color(0xFFD32F2F), Color(0xFF8B0000),
-        Color(0xFFFFC107), Color.Gray,
-        Color(0xFFFFEB3B)
-    )
+    var colors by remember {
+        mutableStateOf(
+            listOf(
+                Color.White, Color.Black,
+                Color(0xFFD32F2F), Color(0xFF8B0000),
+                Color(0xFFFFC107), Color.Gray,
+                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
+                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
+                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
+                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
+                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
+                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
+                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
+                Color(0xFFD32F2F), Color(0xFF8B0000),
+                Color(0xFFD32F2F), Color(0xFF8B0000),
+                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
+                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
+            )
+        )
+    }
 
     val layers = remember { mutableStateListOf("Layer 0", "Layer 1", "Layer 2", "Layer 3") }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier
@@ -75,10 +91,10 @@ fun EditorPage(drawingViewModel: IDrawingViewModel) {
             bottomBar = {
                 Column {
                     BottomBar(
+                        drawingViewModel = drawingViewModel,
                         onLayersClick = { showLayers = !showLayers },
                         onEyeClick = { layerHidden = !layerHidden },
-                        layerHidden, showLayers,
-                        "Change to actual size"
+                        layerHidden, showLayers
                     )
                 }
             },
@@ -101,7 +117,7 @@ fun EditorPage(drawingViewModel: IDrawingViewModel) {
                     .background(Color(0xFF616161))
             ) {
                 DrawCanvas(Modifier.fillMaxSize(), drawingViewModel, { start: Offset, end: Offset ->
-                    drawingViewModel.drawLine(start, end, Color.Blue)
+                    drawingViewModel.drawLine(start, end, selectedColor)
                 })
 
                 Box(
@@ -131,14 +147,19 @@ fun EditorPage(drawingViewModel: IDrawingViewModel) {
                     .fillMaxWidth()
             ) {
                 Column {
-                    ColorPalette(
+                    ColorPaletteWithPicker(
                         colors = colors,
                         selectedColor = selectedColor,
-                        onColorSelected = { selectedColor = it }
+                        onColorSelected = { selectedColor = it },
+                        onColorAdded = { newColor ->
+                            colors = colors + newColor
+                            Log.d("color", colors.size.toString())
+                        },
+                        onColorDeleted = { index ->
+                            colors = colors.filterIndexed { i, _ -> i != index }
+                        },
+                        onCloseClick = { showColorPalette = false }
                     )
-
-                    // Spacer to account for bottom bar
-                    Spacer(modifier = Modifier.height(69.dp))
                 }
             }
         }
@@ -158,9 +179,14 @@ fun EditorPage(drawingViewModel: IDrawingViewModel) {
                 }
             }
         }
+
         // Menu Dialog
         if (showMenu) {
-            MenuDialog(onDismiss = { showMenu = false })
+            MenuDialog(onDismiss = {
+                showMenu = false
+                drawingViewModel.getOperativeData().start()
+            })
+            drawingViewModel.getOperativeData().pause()
         }
     }
 }

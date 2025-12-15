@@ -15,22 +15,28 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ua.ipze.kpi.part.R
+import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
+import ua.ipze.kpi.part.views.localizedStringResource
 
 @Composable
 fun LayersPanel(layers: List<String>) {
+
+    val data = BasePageDataProvider.current
 
     Surface(
         color = Color(0xFF424242),
@@ -64,22 +70,24 @@ fun LayersPanel(layers: List<String>) {
                             text = layer,
                             color = Color.White,
                             fontSize = 16.sp,
-                            fontFamily = FontFamily.Monospace,
                             modifier = Modifier.weight(1f)
                         )
 
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = "Lock",
-                            tint = Color(0xFF9E9E9E),
-                            modifier = Modifier
-                                .size(32.dp)
-                                .padding(4.dp)
-                        )
+                        IconButton(onClick = {}) {
+                            Icon(
+                                painter = painterResource(R.drawable.lock_closed),
+                                contentDescription = null,
+                                tint = Color(0xFF9E9E9E),
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .padding(4.dp)
+                            )
+                        }
+
 
                         Icon(
                             imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
+                            contentDescription = null,
                             tint = Color(0xFF9E9E9E),
                             modifier = Modifier
                                 .size(32.dp)
@@ -101,18 +109,18 @@ fun LayersPanel(layers: List<String>) {
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { }
+                    modifier = Modifier.clickable { TODO("Додати мердж вгору") }
                 ) {
                     Icon(
-                        Icons.Default.Edit,
+                        painter = painterResource(R.drawable.merge_arrow_up),
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = Color(0xffffffff),
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        "Merge up",
-                        color = Color.White,
+                        localizedStringResource(R.string.merge_up, data.language),
+                        color = Color(0xffffffff),
                         fontSize = 14.sp,
                         fontFamily = FontFamily.Monospace
                     )
@@ -120,20 +128,19 @@ fun LayersPanel(layers: List<String>) {
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { }
+                    modifier = Modifier.clickable { TODO("Додати мердж вниз") }
                 ) {
                     Icon(
-                        Icons.Default.Edit,
+                        painter = painterResource(R.drawable.merge_arrow_down),
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = Color(0xffffffff),
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        "Merge down",
-                        color = Color.White,
+                        localizedStringResource(R.string.merge_down, data.language),
+                        color = Color(0xffffffff),
                         fontSize = 14.sp,
-                        fontFamily = FontFamily.Monospace
                     )
                 }
             }

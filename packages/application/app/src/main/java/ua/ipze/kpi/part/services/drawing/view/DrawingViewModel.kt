@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.graphics.createBitmap
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.File
@@ -46,6 +47,7 @@ class DrawingViewModel() :
         this.widthAmountPixels = widthAmountPixels
         this.heightAmountPixels = heightAmountPixels
         this.pixelsPerPixelCell = pixelsPerPixelCell
+        this.operativeData = OperativeData(viewModelScope)
     }
 
     // ----------------------------------------------------
@@ -58,8 +60,9 @@ class DrawingViewModel() :
     private var widthAmountPixels: UInt = 0u
     private var heightAmountPixels: UInt = 0u
     private var pixelsPerPixelCell: UInt = 0u
-
+    private lateinit var operativeData: OperativeData
     // ----------------------------------------------------
+
 
     private fun safeStep() {
     }
@@ -210,6 +213,18 @@ class DrawingViewModel() :
     override fun storeToPng(): ByteArray {
 
         return TODO("Provide the return value")
+    }
+
+    override fun getWidthAmountPixels(): UInt {
+        return widthAmountPixels
+    }
+
+    override fun getHeightAmountPixels(): UInt {
+        return heightAmountPixels
+    }
+
+    override fun getOperativeData(): OperativeData {
+        return operativeData
     }
 
 }

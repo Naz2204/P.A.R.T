@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation("androidx.concurrent:concurrent-futures-ktx:1.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+//    implementation("com.github.skydoves:colorpicker-compose:1.0.7")
 
     ksp(libs.androidx.room.compiler)
 }

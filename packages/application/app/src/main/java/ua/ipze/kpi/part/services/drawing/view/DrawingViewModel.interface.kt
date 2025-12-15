@@ -20,7 +20,6 @@ abstract class IDrawingViewModel() : ViewModel() {
         pixelsPerPixelCell: UInt,
     )
 
-    
     // line drawing
     /**
      * if start == end - draws one pixel
@@ -53,6 +52,12 @@ abstract class IDrawingViewModel() : ViewModel() {
     // work with files
     abstract fun load(file: File): Result<Unit>
     abstract fun storeToPng(): ByteArray
+
+    abstract fun getWidthAmountPixels(): UInt
+
+    abstract fun getHeightAmountPixels(): UInt
+
+    abstract fun getOperativeData(): OperativeData
 
     // internal DON'T USE
     @Suppress("FunctionName")

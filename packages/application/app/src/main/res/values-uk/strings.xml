@@ -25,4 +25,7 @@
     <string name="drawings">рисунки</string>
     <string name="app_themes">теми програми</string>
     <string name="create">СТВОРИТИ</string>
+    <string name="color">Вибери колір</string>
+    <string name="add">Додати</string>
+    <string name="cancel">Скасувати</string>
 </resources>

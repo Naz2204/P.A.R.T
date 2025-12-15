@@ -1,9 +1,9 @@
 package ua.ipze.kpi.part.pages.creation
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,15 +39,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.json.JSONObject
 import ua.ipze.kpi.part.R
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.services.paletteApi.PaletteViewModel
-import ua.ipze.kpi.part.services.paletteApi.colorSchemeToJson
+import ua.ipze.kpi.part.services.qrWorker.QRDialog
 import ua.ipze.kpi.part.services.qrWorker.ScanQrButton
-import ua.ipze.kpi.part.services.qrWorker.generateQrCode
 import ua.ipze.kpi.part.services.qrWorker.jsonToColors
 import ua.ipze.kpi.part.ui.theme.pixelBorder
 import ua.ipze.kpi.part.ui.theme.topBottomBorder
@@ -63,7 +61,8 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
 
     val possibleBackgrounds: List<Long> = listOf(0xffffffff, 0xffff0000, 0xff00ff00, 0xff0000ff)
 
-    val scrollState = rememberScrollState()
+    val scrollStateV = rememberScrollState()
+    val scrollStateH = rememberScrollState()
 
     var name by remember { mutableStateOf("") }
     var width by remember { mutableStateOf("") }
@@ -84,43 +83,8 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
     var showQrDialog by remember { mutableStateOf(false) }
 
     if (showQrDialog) {
-        Dialog(onDismissRequest = { showQrDialog = false }) {
-            Box(
-                modifier = Modifier
-                    .pixelBorder(backgroundColor = Color(0xff232323), borderWidth = 4.dp)
-                    .background(Color.White)
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Text(
-                        text = "Color Scheme QR Code",
-                        fontSize = 20.sp,
-                        color = Color.Black
-                    )
-                    Image(
-                        bitmap = generateQrCode(colorSchemeToJson(colorScheme)),
-                        contentDescription = "QR Code",
-                        modifier = Modifier.size(300.dp)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .topBottomBorder(4.dp, Color(0xff53565a), Color(0xff53565A))
-                            .clickable { showQrDialog = false }
-                            .padding(horizontal = 32.dp)
-                    ) {
-                        Text(
-                            text = "Close",
-                            color = Color(0xffffffff),
-                            fontSize = 18.sp,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    }
-                }
-            }
+        QRDialog(colorScheme) {
+            showQrDialog = false
         }
     }
 
@@ -131,7 +95,7 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
             .padding(15.dp)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .windowInsetsPadding(WindowInsets.ime)
-            .verticalScroll(scrollState),
+            .verticalScroll(scrollStateV),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
@@ -242,7 +206,9 @@ fun CreationPage(languageViewModel: LanguageViewModel) {
             }
 
             Row(
-                modifier = Modifier.padding(top = 10.dp),
+                modifier = Modifier
+                    .padding(top = 10.dp)
+                    .horizontalScroll(scrollStateH),
                 horizontalArrangement = Arrangement.spacedBy(15.dp)
             ) {
                 ScanQrButton { qrJson ->
