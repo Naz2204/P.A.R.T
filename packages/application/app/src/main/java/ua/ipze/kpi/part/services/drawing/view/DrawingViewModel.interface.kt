@@ -22,6 +22,7 @@ abstract class IDrawingViewModel() : ViewModel() {
         databaseViewModel: DatabaseViewModel
     )
 
+    
     // line drawing
     /**
      * if start == end - draws one pixel
