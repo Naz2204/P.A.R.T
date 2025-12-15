@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,7 @@ abstract class IDrawingViewModel() : ViewModel() {
         databaseViewModel: DatabaseViewModel
     )
 
+
     // line drawing
     /**
      * if start == end - draws one pixel
@@ -34,7 +36,7 @@ abstract class IDrawingViewModel() : ViewModel() {
     abstract fun clearLine(start: Offset, end: Offset)
 
     // pick color
-    abstract fun pickColorAt(offset: Offset): Color
+    abstract fun pickColorAt(offset: IntOffset): Color
 
     // move
     abstract fun startMovePixels(selectArea: Rect)
