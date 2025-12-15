@@ -155,7 +155,6 @@ fun ColorPalette(
                 modifier = Modifier.padding(vertical = 8.dp)
             )
 
-            // Color swatches
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

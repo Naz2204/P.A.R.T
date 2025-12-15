@@ -188,11 +188,22 @@ fun EditorPage(drawingViewModel: IDrawingViewModel, id: Long) {
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
             ) {
-                Column {
-                    LayersPanel(layerItems = layers)
+                projectData?.let { it ->
+                    Column {
+                        LayersPanel(
+                            layerItems = layers,
+                            width = it.project.width,
+                            height = it.project.height,
+                            onLayersReordered = {},
+                            onLayerAdd = { layer -> layers = layers + layer },
+                            onLayerDelete = { index ->
+                                layers = layers.filterIndexed { i, _ -> i != index }
+                            }
+                        )
 
-                    // Spacer to account for bottom bar
-                    Spacer(modifier = Modifier.height(69.dp))
+                        // Spacer to account for bottom bar
+                        Spacer(modifier = Modifier.height(69.dp))
+                    }
                 }
             }
         }
