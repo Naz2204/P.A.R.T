@@ -84,6 +84,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("sh.calvin.reorderable:reorderable:2.3.3")
 
     ksp(libs.androidx.room.compiler)
 }
