@@ -1,7 +1,9 @@
 package ua.ipze.kpi.part.services.drawing
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -70,6 +72,12 @@ fun DrawCanvas(
     var wasCentered by remember { mutableStateOf(false) }
     var canvasSize by remember { mutableStateOf(Size(1f, 1f)) }
 
+    val firstOrNull = images.getOrNull(0)
+    LaunchedEffect(firstOrNull?.width, firstOrNull?.height) {
+        wasCentered = false
+    }
+
+
     if (images.isEmpty()) return
     val anyImage = images[0]
 
@@ -82,10 +90,15 @@ fun DrawCanvas(
             .onSizeChanged {
                 canvasSize = it.toSize()
                 if (wasCentered) return@onSizeChanged
+                Log.d("aaa", "1111assdfsdfsdf $wasCentered")
+
                 wasCentered = true // correct code, ignore linter
+                Log.d("aaa", "assdfsdfsdf $wasCentered")
 
                 val scaleX = it.width.toFloat() / anyImage.width
                 val scaleY = it.height.toFloat() / anyImage.height
+                Log.d("aaa", "$scaleX $scaleY ${it.height} ${it.height}")
+                Log.d("aaa", "${anyImage.height} ${anyImage.width}")
                 scaling.floatValue = minOf(scaleX, scaleY)
 
                 val scaledWidth = anyImage.width * scaling.floatValue
@@ -97,6 +110,7 @@ fun DrawCanvas(
             }
     ) {
         images.asReversed().forEach {
+            
             drawImage(
                 image = it,
                 srcOffset = IntOffset.Zero,
