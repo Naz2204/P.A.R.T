@@ -162,6 +162,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     // ----------------------------------------------------
     override fun getLayers(): StateFlow<List<Layer>> = layers.asStateFlow()
     override fun getCurrentActiveLayer(): StateFlow<CurrentActiveLayer?> = activeLayer
+    override fun getCurrentActiveLayerIndex(): StateFlow<UInt> = activeLayerIndex.asStateFlow()
 
     override fun addLayer(layer: Layer) {
         layers.update { return@update listOf(layer) + it }
