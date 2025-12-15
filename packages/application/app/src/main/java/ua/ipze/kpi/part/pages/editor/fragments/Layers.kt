@@ -1,7 +1,9 @@
 package ua.ipze.kpi.part.pages.editor.fragments
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,8 +48,11 @@ import kotlin.math.roundToInt
 
 @Composable
 fun LayersPanel(
+    width: Int, height: Int,
     layerItems: List<Layer>,
-    onLayersReordered: (List<Layer>) -> Unit = {}
+    onLayersReordered: (List<Layer>) -> Unit,
+    onLayerAdd: (Layer) -> Unit,
+    onLayerDelete: (Int) -> Unit
 ) {
     val data = BasePageDataProvider.current
 
@@ -55,7 +60,7 @@ fun LayersPanel(
     var draggedIndex by remember { mutableIntStateOf(-1) }
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var initialDragIndex by remember { mutableIntStateOf(-1) }
-
+    var currentLayer by remember { mutableIntStateOf(0) }
     val lazyListState = rememberLazyListState()
 
     Surface(
@@ -67,123 +72,155 @@ fun LayersPanel(
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
-            LazyColumn(
-                state = lazyListState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f, fill = false)
-            ) {
-                itemsIndexed(
-                    items = layersList,
-                    key = { _, item -> item.id }
-                ) { index, layerItem ->
-                    val isDragging =
-                        layersList.indexOfFirst { it.id == layerItem.id } == draggedIndex
-                    val currentIndex = layersList.indexOfFirst { it.id == layerItem.id }
-                    val offsetY = if (isDragging) dragOffset else 0f
+            Column(modifier = Modifier.padding(8.dp)) {
+                // Action buttons
+                Log.d("red", "redrown2")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    IconButton(onClick = {
+                        onLayerAdd(
+                            Layer(
+                                name = "New Layer",
+                                visibility = true,
+                                lock = false,
+                                imageData = ByteArray(width * height)
+                            )
+                        )
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.add_button_icon),
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                    IconButton(onClick = { onLayerDelete(currentLayer) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.trash_bin),
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                }
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false)
+                ) {
+                    itemsIndexed(
+                        items = layersList,
+                        key = { _, item -> item.id }
+                    ) { index, layerItem ->
+                        val isDragging =
+                            layersList.indexOfFirst { it.id == layerItem.id } == draggedIndex
+                        val currentIndex = layersList.indexOfFirst { it.id == layerItem.id }
+                        val offsetY = if (isDragging) dragOffset else 0f
 
-                    Box(
-                        modifier = Modifier
-                            .offset { IntOffset(0, offsetY.roundToInt()) }
-                            .graphicsLayer {
-                                alpha = if (isDragging) 0.7f else 1f
-                                scaleX = if (isDragging) 1.05f else 1f
-                                scaleY = if (isDragging) 1.05f else 1f
-                            }
-                    ) {
-                        Row(
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp)
-                                .background(
-                                    if (isDragging) Color(0xFF505050) else Color(0xFF303030),
-                                    RoundedCornerShape(4.dp)
-                                )
-                                .padding(4.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .offset { IntOffset(0, offsetY.roundToInt()) }
+                                .graphicsLayer {
+                                    alpha = if (isDragging) 0.7f else 1f
+                                    scaleX = if (isDragging) 1.05f else 1f
+                                    scaleY = if (isDragging) 1.05f else 1f
+                                }
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit",
-                                tint = Color(0xFF9E9E9E),
-                                modifier = Modifier.size(24.dp)
-                            )
-
-                            Text(
-                                text = "${layerItem.name} (ID: ${layerItem.id})",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            IconButton(onClick = {}) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 2.dp)
+                                    .background(
+                                        if (isDragging) Color(0xFF505050) else Color(0xFF303030),
+                                        RoundedCornerShape(4.dp)
+                                    )
+                                    .padding(4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Icon(
-                                    painter = painterResource(R.drawable.lock_closed),
-                                    contentDescription = null,
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit",
                                     tint = Color(0xFF9E9E9E),
                                     modifier = Modifier.size(24.dp)
                                 )
-                            }
 
-                            IconButton(
-                                onClick = {},
-                                modifier = Modifier.pointerInput(layerItem.id) {
-                                    detectDragGesturesAfterLongPress(
-                                        onDragStart = {
-                                            val startIndex =
-                                                layersList.indexOfFirst { it.id == layerItem.id }
-                                            draggedIndex = startIndex
-                                            initialDragIndex = startIndex
-                                            dragOffset = 0f
-                                        },
-                                        onDrag = { change, dragAmount ->
-                                            change.consume()
-                                            dragOffset += dragAmount.y
+                                Text(
+                                    text = "${layerItem.name} (ID: ${layerItem.id})",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    modifier = Modifier.weight(1f)
+                                )
 
-                                            val currentDraggedIndex =
-                                                layersList.indexOfFirst { it.id == layerItem.id }
-
-                                            // Calculate target index based on accumulated drag offset from initial position
-                                            val itemHeight = 44f
-                                            val movedPositions =
-                                                (dragOffset / itemHeight).roundToInt()
-                                            val targetIndex = (initialDragIndex + movedPositions)
-                                                .coerceIn(0, layersList.lastIndex)
-
-                                            if (targetIndex != currentDraggedIndex) {
-                                                val newList = layersList.toMutableList()
-                                                newList.removeAt(currentDraggedIndex)
-                                                newList.add(targetIndex, layerItem)
-                                                layersList = newList
-                                                draggedIndex = targetIndex
-                                            }
-                                        },
-                                        onDragEnd = {
-                                            draggedIndex = -1
-                                            initialDragIndex = -1
-                                            dragOffset = 0f
-                                            onLayersReordered(layersList)
-                                        },
-                                        onDragCancel = {
-                                            draggedIndex = -1
-                                            initialDragIndex = -1
-                                            dragOffset = 0f
-                                        }
+                                IconButton(onClick = {}) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.lock_closed),
+                                        contentDescription = null,
+                                        tint = Color(0xFF9E9E9E),
+                                        modifier = Modifier.size(24.dp)
                                     )
                                 }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Menu,
-                                    contentDescription = "Drag handle",
-                                    tint = Color(0xFF9E9E9E),
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                )
+
+                                IconButton(
+                                    onClick = {},
+                                    modifier = Modifier.pointerInput(layerItem.id) {
+                                        detectDragGesturesAfterLongPress(
+                                            onDragStart = {
+                                                val startIndex =
+                                                    layersList.indexOfFirst { it.id == layerItem.id }
+                                                draggedIndex = startIndex
+                                                initialDragIndex = startIndex
+                                                dragOffset = 0f
+                                            },
+                                            onDrag = { change, dragAmount ->
+                                                change.consume()
+                                                dragOffset += dragAmount.y
+
+                                                val currentDraggedIndex =
+                                                    layersList.indexOfFirst { it.id == layerItem.id }
+
+                                                // Calculate target index based on accumulated drag offset from initial position
+                                                val itemHeight = 44f
+                                                val movedPositions =
+                                                    (dragOffset / itemHeight).roundToInt()
+                                                val targetIndex =
+                                                    (initialDragIndex + movedPositions)
+                                                        .coerceIn(0, layersList.lastIndex)
+
+                                                if (targetIndex != currentDraggedIndex) {
+                                                    val newList = layersList.toMutableList()
+                                                    newList.removeAt(currentDraggedIndex)
+                                                    newList.add(targetIndex, layerItem)
+                                                    layersList = newList
+                                                    draggedIndex = targetIndex
+                                                }
+                                            },
+                                            onDragEnd = {
+                                                draggedIndex = -1
+                                                initialDragIndex = -1
+                                                dragOffset = 0f
+                                                onLayersReordered(layersList)
+                                            },
+                                            onDragCancel = {
+                                                draggedIndex = -1
+                                                initialDragIndex = -1
+                                                dragOffset = 0f
+                                            }
+                                        )
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Menu,
+                                        contentDescription = "Drag handle",
+                                        tint = Color(0xFF9E9E9E),
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                    )
+                                }
                             }
                         }
                     }
                 }
-            }
 
 //            HorizontalDivider(
 //                modifier = Modifier.padding(vertical = 8.dp),
@@ -233,7 +270,8 @@ fun LayersPanel(
 //                }
 //            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }
