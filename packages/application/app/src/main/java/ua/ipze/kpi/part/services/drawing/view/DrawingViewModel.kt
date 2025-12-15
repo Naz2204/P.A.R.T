@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.views.DatabaseProjectWithLayers
 import ua.ipze.kpi.part.views.DatabaseViewModel
@@ -56,7 +57,7 @@ class DrawingViewModel() : IDrawingViewModel() {
         this.historyLength = historyLength
         amountOfSteps = MutableStateFlow(DrawingAmountOfSteps(0u, 0u))
 
-        viewModelScope.launch {
+        val job = viewModelScope.launch {
             val data = databaseViewModel.getProjectWithLayers(id)
             if (data == null) {
                 closePageOnFailure()
@@ -103,6 +104,8 @@ class DrawingViewModel() : IDrawingViewModel() {
                 null
             )
         }
+
+        runBlocking { job.join() }
     }
 
     private fun getBitmap(
