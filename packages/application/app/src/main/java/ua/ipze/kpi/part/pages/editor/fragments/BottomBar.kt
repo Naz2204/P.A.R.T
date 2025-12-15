@@ -27,11 +27,10 @@ import ua.ipze.kpi.part.ui.theme.pixelBorder
 fun BottomBar(
     drawingViewModel: IDrawingViewModel,
     onLayersClick: () -> Unit,
-    onEyeClick: () -> Unit,
-    layerHidden: Boolean,
     layersOpen: Boolean
 ) {
     drawingViewModel.getOperativeData().start()
+    val activeLayer = drawingViewModel.getCurrentActiveLayer().collectAsState()
     val maxBottomBar = 69.dp
 
     Column(
@@ -49,7 +48,7 @@ fun BottomBar(
                 .padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
             Text(
-                text = "Layer 1",
+                text = "Layer ${activeLayer.value?.layer?.id}",
                 color = Color.White,
                 fontSize = 14.sp,
                 modifier = Modifier
@@ -57,13 +56,18 @@ fun BottomBar(
                     .padding(5.dp)
                     .weight(0.7f)
             )
-            IconButton(onClick = onEyeClick) {
+            IconButton(onClick = {
+                drawingViewModel.setVisibilityOfLayer(
+                    drawingViewModel.getCurrentActiveLayerIndex().value,
+                    !(activeLayer.value?.layer?.visibility ?: true)
+                )
+            }) {
                 Icon(
                     painter = painterResource(
-                        if (layerHidden) R.drawable.hidden_eye
-                        else R.drawable.open_eye
+                        if (activeLayer.value?.layer?.visibility ?: true) R.drawable.open_eye
+                        else R.drawable.hidden_eye
                     ),
-                    contentDescription = "Hide/Unhide",
+                    contentDescription = null,
                     tint = Color(0xffffffff),
                     modifier = Modifier.size(20.dp)
                 )
@@ -74,7 +78,7 @@ fun BottomBar(
                         if (layersOpen) R.drawable.menu_arrow_up
                         else R.drawable.menu_arrow_down
                     ),
-                    contentDescription = "Layers",
+                    contentDescription = null,
                     tint = Color(0xffffffff),
                     modifier = Modifier.size(15.dp)
                 )

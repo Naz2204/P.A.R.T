@@ -43,6 +43,7 @@ import ua.ipze.kpi.part.pages.editor.fragments.MenuDialog
 import ua.ipze.kpi.part.pages.editor.fragments.TopToolbar
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.services.drawing.DrawCanvas
+import ua.ipze.kpi.part.services.drawing.view.DrawingViewModel
 import ua.ipze.kpi.part.services.drawing.view.IDrawingViewModel
 import ua.ipze.kpi.part.views.DatabaseProjectWithLayers
 
@@ -99,8 +100,7 @@ fun EditorPage(drawingViewModel: IDrawingViewModel, id: Long) {
                     BottomBar(
                         drawingViewModel = drawingViewModel,
                         onLayersClick = { showLayers = !showLayers },
-                        onEyeClick = { layerHidden = !layerHidden },
-                        layerHidden, showLayers
+                        layerHidden
                     )
                 }
             },
@@ -191,14 +191,9 @@ fun EditorPage(drawingViewModel: IDrawingViewModel, id: Long) {
                 projectData?.let { it ->
                     Column {
                         LayersPanel(
-                            layerItems = layers,
                             width = it.project.width,
                             height = it.project.height,
-                            onLayersReordered = {},
-                            onLayerAdd = { layer -> layers = layers + layer },
-                            onLayerDelete = { index ->
-                                layers = layers.filterIndexed { i, _ -> i != index }
-                            }
+                            drawingViewModel = drawingViewModel as DrawingViewModel
                         )
 
                         // Spacer to account for bottom bar

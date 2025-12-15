@@ -174,7 +174,7 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     override fun deleteLayer(index: UInt) {
         layers.update {
-            it.toMutableList().filterIndexed { indexFilter, _ -> indexFilter == index.toInt() }
+            it.toMutableList().filterIndexed { indexFilter, _ -> indexFilter != index.toInt() }
                 .toList()
         }
         triggerRedraw()
