@@ -19,6 +19,7 @@ import ua.ipze.kpi.part.pages.login.PasswordCreationPage
 import ua.ipze.kpi.part.providers.basePageData.BasePageData
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.services.drawing.view.DrawingViewModel
+import ua.ipze.kpi.part.services.geogetter.LocationViewModel
 import ua.ipze.kpi.part.utils.Biometry
 import ua.ipze.kpi.part.views.DatabaseViewModel
 import ua.ipze.kpi.part.views.LanguageViewModel
@@ -30,21 +31,30 @@ fun AppRouter(
     languageViewModel: LanguageViewModel,
     passwordViewModel: PasswordViewModel,
     databaseViewModel: DatabaseViewModel,
-    promptManager: Biometry
+    promptManager: Biometry,
+    locationViewModel: LocationViewModel
 ) {
     val navController = rememberNavController()
     val basicPageData =
-        remember { BasePageData(innerPadding, navController, languageViewModel, databaseViewModel) }
+        remember {
+            BasePageData(
+                innerPadding,
+                navController,
+                languageViewModel,
+                databaseViewModel,
+                locationViewModel
+            )
+        }
 
     CompositionLocalProvider(BasePageDataProvider provides basicPageData) {
         NavHost(
             navController = navController,
-//            startDestination = EditorPageData(
-//                drawingWidthPixels = 500,
-//                drawingHeightPixels = 500,
-//                historyLength = 1
-//            ),
-            startDestination = CreateArtPageData,
+            startDestination = EditorPageData(
+                drawingWidthPixels = 500,
+                drawingHeightPixels = 500,
+                historyLength = 1
+            ),
+//            startDestination = CreateArtPageData,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,

@@ -11,7 +11,6 @@ data class Project(
     val width: Int,
     val height: Int,
     val name: String,
-    val lastGeolocation: String,
     val lastSettlement: String,
     val palette: PaletteList,
     val timer: Long,

@@ -1,14 +1,19 @@
 package ua.ipze.kpi.part
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -18,6 +23,7 @@ import ua.ipze.kpi.part.database.ArtDatabase
 import ua.ipze.kpi.part.providers.MainActivityData
 import ua.ipze.kpi.part.providers.MainActivityDataProvider
 import ua.ipze.kpi.part.router.AppRouter
+import ua.ipze.kpi.part.services.geogetter.LocationViewModel
 import ua.ipze.kpi.part.ui.theme.PARTTheme
 import ua.ipze.kpi.part.utils.Biometry
 import ua.ipze.kpi.part.views.DatabaseViewModel
@@ -37,6 +43,19 @@ class MainActivity : AppCompatActivity() {
         Biometry(this)
     }
 
+    private val locationViewModel: LocationViewModel by viewModels()
+
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                    permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true -> {
+                locationViewModel.fetchLocation()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             val mainActivityData = remember { MainActivityData(this) }
 
             databaseViewModel.initialize(artDatabase)
-
+            checkAndRequestLocation()
             CompositionLocalProvider(MainActivityDataProvider provides mainActivityData) {
                 PARTTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -62,11 +81,33 @@ class MainActivity : AppCompatActivity() {
                             languageViewModel,
                             passwordViewModel,
                             databaseViewModel,
-                            promptManager
+                            promptManager,
+                            locationViewModel
                         )
                     }
                 }
             }
         }
     }
+
+    private fun checkAndRequestLocation() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                locationViewModel.fetchLocation()
+            }
+
+            else -> {
+                locationPermissionRequest.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
+        }
+    }
+
 }

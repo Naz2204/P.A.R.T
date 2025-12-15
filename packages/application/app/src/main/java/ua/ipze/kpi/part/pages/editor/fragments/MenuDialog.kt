@@ -13,6 +13,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,10 +59,18 @@ fun MenuDialog(onDismiss: () -> Unit) {
                         color = Color(0xffffffff),
                         textAlign = TextAlign.Center,
                         fontSize = 30.sp,
-                        modifier = Modifier.padding(start = 30.dp).weight(0.9f)
+                        modifier = Modifier
+                            .padding(start = 30.dp)
+                            .weight(0.9f)
                     )
 
-                    IconButton(onClick = onDismiss, modifier = Modifier.size(30.dp).weight(0.1f).padding(bottom = 1.dp)) {
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .weight(0.1f)
+                            .padding(bottom = 1.dp)
+                    ) {
                         Icon(
                             painter = painterResource(R.drawable.close_x_icon),
                             contentDescription = null,
@@ -72,15 +81,19 @@ fun MenuDialog(onDismiss: () -> Unit) {
 
 //                Spacer(modifier = Modifier.height(24.dp))
 
-                Column (
+                Column(
                     modifier = Modifier
 //                        .fillMaxWidth()
                         .clickable {
                             TODO("Додати експорт зображення")
                         }
-                        .topBottomBorder(strokeWidth = 4.dp, borderColor = Color(0xffffffff), backgroundColor = Color.Transparent)
+                        .topBottomBorder(
+                            strokeWidth = 4.dp,
+                            borderColor = Color(0xffffffff),
+                            backgroundColor = Color.Transparent
+                        )
                         .padding(vertical = 10.dp)
-                ){
+                ) {
                     Text(
                         text = localizedStringResource(R.string.export, data.language),
                         color = Color(0xffffffff),
@@ -89,14 +102,18 @@ fun MenuDialog(onDismiss: () -> Unit) {
                     )
                 }
 
-                Column (
+                Column(
                     modifier = Modifier
 //                        .fillMaxWidth()
                         .clickable {
                             TODO("Додати збереження перед переходом до галереї")
                             data.nav.navigate(GalleryPageData)
                         }
-                        .topBottomBorder(strokeWidth = 4.dp, borderColor = Color(0xffffffff), backgroundColor = Color.Transparent)
+                        .topBottomBorder(
+                            strokeWidth = 4.dp,
+                            borderColor = Color(0xffffffff),
+                            backgroundColor = Color.Transparent
+                        )
                         .padding(vertical = 10.dp)
                 ) {
                     Text(
@@ -107,21 +124,24 @@ fun MenuDialog(onDismiss: () -> Unit) {
                     )
                 }
 
-                Row (
+                Row(
                     modifier = Modifier
 //                        .fillMaxWidth()
                         .clickable {
                             if (data.language.localeState.currentLocale.toLanguageTag() == "uk") {
                                 language = "en"
-                            }
-                            else {
+                            } else {
                                 language = "uk"
                             }
                             data.language.setAppLanguage(language)
                         }
-                        .topBottomBorder(strokeWidth = 4.dp, borderColor = Color(0xffffffff), backgroundColor = Color.Transparent)
+                        .topBottomBorder(
+                            strokeWidth = 4.dp,
+                            borderColor = Color(0xffffffff),
+                            backgroundColor = Color.Transparent
+                        )
                         .padding(vertical = 10.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Text(
                         text = localizedStringResource(R.string.language, data.language),
@@ -136,15 +156,19 @@ fun MenuDialog(onDismiss: () -> Unit) {
                         modifier = Modifier.weight(0.1f)
                     )
                 }
-                Column (
+                Column(
                     modifier = Modifier
                         .clickable {
                             TODO("Додати збереження перед виходом")
                             activity.activity.finish()
                         }
-                        .topBottomBorder(strokeWidth = 4.dp, borderColor = Color(0xffffffff), backgroundColor = Color.Transparent)
+                        .topBottomBorder(
+                            strokeWidth = 4.dp,
+                            borderColor = Color(0xffffffff),
+                            backgroundColor = Color.Transparent
+                        )
                         .padding(vertical = 10.dp)
-                ){
+                ) {
                     Text(
                         text = localizedStringResource(R.string.exit, data.language),
                         color = Color(0xffffffff),
@@ -152,9 +176,9 @@ fun MenuDialog(onDismiss: () -> Unit) {
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-
+                val city by data.locationViewModel.city.collectAsState()
                 Text(
-                    text = "Lviv, Ukraine",
+                    text = city.toString(),
                     color = Color(0xFF9E9E9E),
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)

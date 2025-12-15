@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -299,6 +300,9 @@ fun CreationPage() {
             )
         }
 
+        val city by data.locationViewModel.city.collectAsState()
+//        val isLoading by data.locationViewModel.isLoading.collectAsState()
+
         Spacer(modifier = Modifier.weight(0.8f))
         Box(
             modifier = Modifier
@@ -326,8 +330,7 @@ fun CreationPage() {
                         height = height.toIntOrNull() ?: 1,
                         name = name,
                         //TODO додати геолокацію
-                        lastGeolocation = "",
-                        lastSettlement = "",
+                        lastSettlement = city.toString(),
                         palette = PaletteList(colorScheme.map { it ->
                             Color(it[0], it[1], it[2]).toColorLong()
                         }),
