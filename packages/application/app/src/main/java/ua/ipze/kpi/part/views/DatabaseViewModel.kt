@@ -2,11 +2,9 @@ package ua.ipze.kpi.part.views
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import ua.ipze.kpi.part.database.ArtDatabase
 import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.database.project.LayersList
@@ -59,14 +57,16 @@ class DatabaseViewModel : ViewModel() {
     // -------------------
     // insert
 
-    fun saveProject(project: Project, layers: List<Layer>) {
-        viewModelScope.launch {
+    suspend fun saveProject(project: Project, layers: List<Layer>): Long? {
+        return try {
             artDao.withTransaction {
                 val layerIds = layers.map { layer -> artDao.layerDao.upsertLayer(layer) }
-                artDao.projectDao.upsertProject(
-                    project.copy(layers = LayersList(layersList = layerIds))
-                )
+                Log.d("db_test", "Created ${layerIds}")
+                val _project = project.copy(layers = LayersList(layersList = layerIds))
+                artDao.projectDao.upsertProject(_project)
             }
+        } catch (_: Throwable) {
+            null
         }
     }
 

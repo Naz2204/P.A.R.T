@@ -49,12 +49,13 @@ fun AppRouter(
     CompositionLocalProvider(BasePageDataProvider provides basicPageData) {
         NavHost(
             navController = navController,
-            startDestination = EditorPageData(
-                drawingWidthPixels = 500,
-                drawingHeightPixels = 500,
-                historyLength = 1
-            ),
-//            startDestination = CreateArtPageData,
+//            startDestination = EditorPageData(
+//                drawingWidthPixels = 500,
+//                drawingHeightPixels = 500,
+//                historyLength = 1,
+//                id = 0
+//            ),
+            startDestination = CreateArtPageData,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -98,7 +99,7 @@ fun AppRouter(
                     databaseViewModel,
                 )
 
-                EditorPage(drawingViewModel)
+                EditorPage(drawingViewModel, data.id)
             }
         }
     }

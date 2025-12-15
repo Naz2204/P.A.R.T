@@ -1,5 +1,6 @@
 package ua.ipze.kpi.part.pages.creation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -29,11 +30,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toColorLong
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -52,6 +54,7 @@ import ua.ipze.kpi.part.database.project.LayersList
 import ua.ipze.kpi.part.database.project.PaletteList
 import ua.ipze.kpi.part.database.project.Project
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
+import ua.ipze.kpi.part.router.EditorPageData
 import ua.ipze.kpi.part.services.paletteApi.PaletteViewModel
 import ua.ipze.kpi.part.services.qrWorker.QRDialog
 import ua.ipze.kpi.part.services.qrWorker.ScanQrButton
@@ -90,6 +93,8 @@ fun CreationPage() {
     }
     var selectedBg by remember { mutableIntStateOf(0) }
     var showQrDialog by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     if (showQrDialog) {
         QRDialog(colorScheme) {
@@ -332,12 +337,24 @@ fun CreationPage() {
                         //TODO додати геолокацію
                         lastSettlement = city.toString(),
                         palette = PaletteList(colorScheme.map { it ->
-                            Color(it[0], it[1], it[2]).toColorLong()
+                            Color(it[0], it[1], it[2]).value.toLong()
                         }),
                         timer = 0,
                         lastModified = epochTime,
                     )
-                    data.databaseViewModel.saveProject(project, listLayer)
+                    Log.d("db_test", "Palette ${project.palette}")
+
+                    scope.launch {
+                        val id: Long = data.databaseViewModel.saveProject(project, listLayer) ?: 0
+                        data.nav.navigate(
+                            EditorPageData(
+                                drawingHeightPixels = height.toIntOrNull() ?: 0,
+                                drawingWidthPixels = width.toIntOrNull() ?: 0,
+                                historyLength = 0,
+                                id = id
+                            )
+                        )
+                    }
                 })
 
         ) {

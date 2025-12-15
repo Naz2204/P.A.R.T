@@ -21,8 +21,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,46 +33,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ua.ipze.kpi.part.R
+import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.pages.editor.fragments.BottomBar
 import ua.ipze.kpi.part.pages.editor.fragments.ColorPaletteWithPicker
 import ua.ipze.kpi.part.pages.editor.fragments.LayersPanel
 import ua.ipze.kpi.part.pages.editor.fragments.MenuDialog
 import ua.ipze.kpi.part.pages.editor.fragments.TopToolbar
+import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.services.drawing.DrawCanvas
 import ua.ipze.kpi.part.services.drawing.view.IDrawingViewModel
+import ua.ipze.kpi.part.views.DatabaseProjectWithLayers
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorPage(drawingViewModel: IDrawingViewModel) {
+fun EditorPage(drawingViewModel: IDrawingViewModel, id: Long) {
+
+    val data = BasePageDataProvider.current
+
+    var projectData by remember { mutableStateOf<DatabaseProjectWithLayers?>(null) }
+
+    var layers by remember { mutableStateOf<List<Layer>>(emptyList()) }
+
     var showMenu by remember { mutableStateOf(false) }
     var showColorPalette by remember { mutableStateOf(false) }
     var showLayers by remember { mutableStateOf(false) }
     var layerHidden by remember { mutableStateOf(false) }
     var selectedTool by remember { mutableStateOf(4) }
     var selectedColor by remember { mutableStateOf(Color(0xFFFFEB3B)) }
+    var colors by remember { mutableStateOf<List<Color>>(emptyList()) }
 
-    var colors by remember {
-        mutableStateOf(
-            listOf(
-                Color.White, Color.Black,
-                Color(0xFFD32F2F), Color(0xFF8B0000),
-                Color(0xFFFFC107), Color.Gray,
-                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
-                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
-                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
-                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
-                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
-                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
-                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
-                Color(0xFFD32F2F), Color(0xFF8B0000),
-                Color(0xFFD32F2F), Color(0xFF8B0000),
-                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
-                Color(0xFFFFEB3B), Color(0xFFFFEB3B),
-            )
-        )
+    LaunchedEffect(id) {
+        projectData = data.databaseViewModel.getProjectWithLayers(id)
     }
 
-    val layers = remember { mutableStateListOf("Layer 0", "Layer 1", "Layer 2", "Layer 3") }
+    // Use projectData here (will be null initially, then populate)
+    projectData?.let { project ->
+        layers = project.layers
+        colors = project.project.palette.paletteList.map {
+            Color(it.toULong())
+        }
+    }
+
+//    LayersPanel(layerItems = layers)
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -178,7 +180,7 @@ fun EditorPage(drawingViewModel: IDrawingViewModel) {
                     .fillMaxWidth()
             ) {
                 Column {
-                    LayersPanel(layers = layers)
+                    LayersPanel(layerItems = layers)
 
                     // Spacer to account for bottom bar
                     Spacer(modifier = Modifier.height(69.dp))

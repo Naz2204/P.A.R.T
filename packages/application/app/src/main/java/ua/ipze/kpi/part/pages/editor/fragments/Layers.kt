@@ -40,16 +40,18 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ua.ipze.kpi.part.R
+import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import kotlin.math.roundToInt
 
 @Composable
 fun LayersPanel(
-    layers: List<String>,
-    onLayersReordered: (List<String>) -> Unit = {}
+    layerItems: List<Layer>,
+    onLayersReordered: (List<Layer>) -> Unit = {}
 ) {
     val data = BasePageDataProvider.current
-    var layersList by remember(layers) { mutableStateOf(layers) }
+
+    var layersList by remember(layerItems) { mutableStateOf(layerItems) }
     var draggedIndex by remember { mutableIntStateOf(-1) }
     var dragOffset by remember { mutableFloatStateOf(0f) }
     var initialDragIndex by remember { mutableIntStateOf(-1) }
@@ -73,10 +75,11 @@ fun LayersPanel(
             ) {
                 itemsIndexed(
                     items = layersList,
-                    key = { _, item -> item }
-                ) { index, layer ->
-                    val isDragging = layersList.indexOf(layer) == draggedIndex
-                    val currentIndex = layersList.indexOf(layer)
+                    key = { _, item -> item.id }
+                ) { index, layerItem ->
+                    val isDragging =
+                        layersList.indexOfFirst { it.id == layerItem.id } == draggedIndex
+                    val currentIndex = layersList.indexOfFirst { it.id == layerItem.id }
                     val offsetY = if (isDragging) dragOffset else 0f
 
                     Box(
@@ -107,7 +110,7 @@ fun LayersPanel(
                             )
 
                             Text(
-                                text = layer,
+                                text = "${layerItem.name} (ID: ${layerItem.id})",
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 modifier = Modifier.weight(1f)
@@ -124,10 +127,11 @@ fun LayersPanel(
 
                             IconButton(
                                 onClick = {},
-                                modifier = Modifier.pointerInput(layer) {
+                                modifier = Modifier.pointerInput(layerItem.id) {
                                     detectDragGesturesAfterLongPress(
                                         onDragStart = {
-                                            val startIndex = layersList.indexOf(layer)
+                                            val startIndex =
+                                                layersList.indexOfFirst { it.id == layerItem.id }
                                             draggedIndex = startIndex
                                             initialDragIndex = startIndex
                                             dragOffset = 0f
@@ -136,7 +140,8 @@ fun LayersPanel(
                                             change.consume()
                                             dragOffset += dragAmount.y
 
-                                            val currentDraggedIndex = layersList.indexOf(layer)
+                                            val currentDraggedIndex =
+                                                layersList.indexOfFirst { it.id == layerItem.id }
 
                                             // Calculate target index based on accumulated drag offset from initial position
                                             val itemHeight = 44f
@@ -148,7 +153,7 @@ fun LayersPanel(
                                             if (targetIndex != currentDraggedIndex) {
                                                 val newList = layersList.toMutableList()
                                                 newList.removeAt(currentDraggedIndex)
-                                                newList.add(targetIndex, layer)
+                                                newList.add(targetIndex, layerItem)
                                                 layersList = newList
                                                 draggedIndex = targetIndex
                                             }
