@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.Flow
 interface LayerDao {
 
     @Upsert
-    suspend fun upsertLayer(layer: Layer)
+    suspend fun upsertLayer(layer: Layer): Long
 
     @Delete
     suspend fun deleteLayer(layer: Layer)
 
     @Query("SELECT * FROM layer WHERE id IN(:layerIds)")
-    fun getLayers(layerIds: List<Int>): Flow<List<Layer>>
+    fun getLayers(layerIds: List<Long>): Flow<List<Layer>>
 
 }

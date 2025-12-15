@@ -20,6 +20,7 @@ import ua.ipze.kpi.part.providers.basePageData.BasePageData
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.services.drawing.view.DrawingViewModel
 import ua.ipze.kpi.part.utils.Biometry
+import ua.ipze.kpi.part.views.DatabaseViewModel
 import ua.ipze.kpi.part.views.LanguageViewModel
 import ua.ipze.kpi.part.views.PasswordViewModel
 
@@ -28,10 +29,12 @@ fun AppRouter(
     innerPadding: PaddingValues,
     languageViewModel: LanguageViewModel,
     passwordViewModel: PasswordViewModel,
+    databaseViewModel: DatabaseViewModel,
     promptManager: Biometry
 ) {
     val navController = rememberNavController()
-    val basicPageData = remember { BasePageData(innerPadding, navController, languageViewModel) }
+    val basicPageData =
+        remember { BasePageData(innerPadding, navController, languageViewModel, databaseViewModel) }
 
     CompositionLocalProvider(BasePageDataProvider provides basicPageData) {
         NavHost(
@@ -80,7 +83,8 @@ fun AppRouter(
                     data.historyLength.toUInt(),
                     data.drawingHeightPixels.toUInt(),
                     data.drawingWidthPixels.toUInt(),
-                    20.toUInt()
+                    20.toUInt(),
+                    databaseViewModel,
                 )
 
                 EditorPage(drawingViewModel)
