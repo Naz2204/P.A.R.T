@@ -163,6 +163,19 @@ class DrawingViewModel() : IDrawingViewModel() {
     override fun getLayers(): StateFlow<List<Layer>> = layers.asStateFlow()
     override fun getCurrentActiveLayer(): StateFlow<CurrentActiveLayer?> = activeLayer
 
+    override fun addLayer(layer: Layer) {
+        layers.update { return@update listOf(layer) + it }
+        triggerRedraw()
+    }
+
+    override fun deleteLayer(index: UInt) {
+        layers.update {
+            it.toMutableList().filterIndexed { indexFilter, _ -> indexFilter == index.toInt() }
+                .toList()
+        }
+        triggerRedraw()
+    }
+
     override fun swapLayers(a: UInt, b: UInt) {
         layers.update {
             val layersAmount = it.size.toUInt()

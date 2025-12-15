@@ -25,6 +25,8 @@ abstract class IDrawingViewModel() : ViewModel() {
     )
 
     // data
+    abstract fun addLayer(layer: Layer)
+    abstract fun deleteLayer(index: UInt)
     abstract fun getLayers(): StateFlow<List<Layer>>
     abstract fun getCurrentActiveLayer(): StateFlow<CurrentActiveLayer?>
     abstract fun swapLayers(a: UInt, b: UInt)
