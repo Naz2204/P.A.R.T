@@ -176,6 +176,7 @@ class DrawingViewModel() : IDrawingViewModel() {
                 this[b.toInt()] = tmp
             }.toList()
         }
+        triggerRedraw()
 
     }
 
@@ -189,6 +190,7 @@ class DrawingViewModel() : IDrawingViewModel() {
             if (idx == i) layer.copy(visibility = isVisible)
             else layer
         }
+        triggerRedraw()
     }
 
     override fun setLockOnLayer(index: UInt, isLocked: Boolean) {
