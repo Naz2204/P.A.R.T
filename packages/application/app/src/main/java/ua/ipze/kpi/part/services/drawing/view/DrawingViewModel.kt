@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import ua.ipze.kpi.part.views.DatabaseViewModel
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -30,6 +31,7 @@ class DrawingViewModel() :
         widthAmountPixels: UInt,
         heightAmountPixels: UInt,
         pixelsPerPixelCell: UInt,
+        databaseViewModel: DatabaseViewModel,
     ) {
         if (!initialized.compareAndSet(false, true)) {
             Log.e(Tag, "Got second init")
@@ -46,6 +48,7 @@ class DrawingViewModel() :
         this.widthAmountPixels = widthAmountPixels
         this.heightAmountPixels = heightAmountPixels
         this.pixelsPerPixelCell = pixelsPerPixelCell
+        this.databaseViewModel = databaseViewModel
     }
 
     // ----------------------------------------------------
@@ -58,6 +61,7 @@ class DrawingViewModel() :
     private var widthAmountPixels: UInt = 0u
     private var heightAmountPixels: UInt = 0u
     private var pixelsPerPixelCell: UInt = 0u
+    private lateinit var databaseViewModel: DatabaseViewModel
 
     // ----------------------------------------------------
 

@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import ua.ipze.kpi.part.views.DatabaseViewModel
 import java.io.File
 
 data class DrawingAmountOfSteps(val backward: UInt, val forward: UInt)
@@ -18,6 +19,7 @@ abstract class IDrawingViewModel() : ViewModel() {
         widthAmountPixels: UInt,
         heightAmountPixels: UInt,
         pixelsPerPixelCell: UInt,
+        databaseViewModel: DatabaseViewModel
     )
 
     

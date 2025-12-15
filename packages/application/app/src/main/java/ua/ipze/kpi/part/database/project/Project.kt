@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 @Entity
 data class Project(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val layers : LayersList,
+    val id: Long = 0,
+    var layers: LayersList,
     val width: Int,
     val height: Int,
     val name: String,
@@ -19,7 +19,7 @@ data class Project(
 )
 
 data class LayersList(
-    val layersList : List<Int>,
+    val layersList: List<Long>,
 )
 
 data class PaletteList(
