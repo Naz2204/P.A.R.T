@@ -99,7 +99,13 @@ fun EditorPage(drawingViewModel: IDrawingViewModel) {
                 }
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = { showColorPalette = !showColorPalette }) {
+                FloatingActionButton(
+                    onClick = { showColorPalette = !showColorPalette },
+                    containerColor = Color(0xff777777),
+                    modifier = Modifier
+                        .border(width = 3.dp, color = Color.White)
+                        .background(Color(0xff777777))
+                ) {
                     Icon(
                         painter = painterResource(R.drawable.color_selector_icon),
                         contentDescription = "Add",

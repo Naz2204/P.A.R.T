@@ -13,15 +13,16 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.graphics.createBitmap
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import ua.ipze.kpi.part.views.DatabaseViewModel
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
 private val Tag = DrawingViewModel::class.simpleName ?: ""
 
-class DrawingViewModel() :
-    IDrawingViewModel() {
+class DrawingViewModel() : IDrawingViewModel() {
 
     private val initialized = AtomicBoolean(false)
 
@@ -30,6 +31,7 @@ class DrawingViewModel() :
         widthAmountPixels: UInt,
         heightAmountPixels: UInt,
         pixelsPerPixelCell: UInt,
+        databaseViewModel: DatabaseViewModel
     ) {
         if (!initialized.compareAndSet(false, true)) {
             Log.e(Tag, "Got second init")
