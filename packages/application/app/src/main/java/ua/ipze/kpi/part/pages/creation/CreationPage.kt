@@ -71,7 +71,12 @@ fun CreationPage() {
     val paletteViewModel: PaletteViewModel = viewModel()
 
     //TODO можливо замінити випадаюче меню на меню вибору кольору
-    val possibleBackgrounds: List<Long> = listOf(0xffffffff, 0xffff0000, 0xff00ff00, 0xff0000ff)
+    val possibleBackgrounds: List<Color> = listOf(
+        Color(0xffffffff),
+        Color(0xffff0000),
+        Color(0xff00ff00),
+        Color(0xff0000ff)
+    )
 
     val scrollStateV = rememberScrollState()
     val scrollStateH = rememberScrollState()
@@ -129,7 +134,7 @@ fun CreationPage() {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Column() {
+        Column {
             Text(
                 text = localizedStringResource(R.string.name, data.language),
                 fontSize = 20.sp,
@@ -148,7 +153,7 @@ fun CreationPage() {
                 textStyle = TextStyle(color = Color(0xffffffff))
             )
         }
-        Column() {
+        Column {
             Text(
                 text = localizedStringResource(R.string.size, data.language),
                 fontSize = 20.sp,
@@ -192,7 +197,7 @@ fun CreationPage() {
             }
         }
 
-        Column() {
+        Column {
             Text(
                 text = localizedStringResource(R.string.init_color_scheme, data.language),
                 fontSize = 20.sp,
@@ -265,7 +270,7 @@ fun CreationPage() {
             }
         }
 
-        Column() {
+        Column {
             Text(
                 text = localizedStringResource(R.string.init_layers_num, data.language),
                 fontSize = 20.sp,
@@ -286,7 +291,7 @@ fun CreationPage() {
             )
         }
 
-        Column() {
+        Column {
             Text(
                 text = localizedStringResource(R.string.bg_fill, data.language),
                 fontSize = 20.sp,
@@ -324,9 +329,7 @@ fun CreationPage() {
                             name = "",
                             visibility = true,
                             lock = false,
-                            imageData = ByteArray(
-                                ((width.toIntOrNull() ?: 1) * (height.toIntOrNull() ?: 1))
-                            )
+                            imageData = ByteArray(0)
                         )
                     }
                     val project = Project(
@@ -341,6 +344,7 @@ fun CreationPage() {
                         }),
                         timer = 0,
                         lastModified = epochTime,
+                        baseColor = possibleBackgrounds[selectedBg].value.toLong()
                     )
                     Log.d("db_test", "Palette ${project.palette}")
 
@@ -348,8 +352,6 @@ fun CreationPage() {
                         val id: Long = data.databaseViewModel.saveProject(project, listLayer) ?: 0
                         data.nav.navigate(
                             EditorPageData(
-                                drawingHeightPixels = height.toIntOrNull() ?: 0,
-                                drawingWidthPixels = width.toIntOrNull() ?: 0,
                                 historyLength = 0,
                                 id = id
                             )

@@ -17,10 +17,10 @@ abstract class IDrawingViewModel() : ViewModel() {
     // construct
     abstract fun initialize(
         historyLength: UInt,
-        widthAmountPixels: UInt,
-        heightAmountPixels: UInt,
         pixelsPerPixelCell: UInt,
-        databaseViewModel: DatabaseViewModel
+        id: Long,
+        databaseViewModel: DatabaseViewModel,
+        closePageOnFailure: () -> Unit
     )
 
 

@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import ua.ipze.kpi.part.R
 import ua.ipze.kpi.part.database.layer.Layer
@@ -58,7 +60,7 @@ fun EditorPage(drawingViewModel: IDrawingViewModel, id: Long) {
     var showColorPalette by remember { mutableStateOf(false) }
     var showLayers by remember { mutableStateOf(false) }
     var layerHidden by remember { mutableStateOf(false) }
-    var selectedTool by remember { mutableStateOf(4) }
+    var selectedTool by remember { mutableIntStateOf(3) }
     var selectedColor by remember { mutableStateOf(Color(0xFFFFEB3B)) }
     var colors by remember { mutableStateOf<List<Color>>(emptyList()) }
 
@@ -67,10 +69,12 @@ fun EditorPage(drawingViewModel: IDrawingViewModel, id: Long) {
     }
 
     // Use projectData here (will be null initially, then populate)
-    projectData?.let { project ->
-        layers = project.layers
-        colors = project.project.palette.paletteList.map {
-            Color(it.toULong())
+    LaunchedEffect(projectData) {
+        projectData?.let { project ->
+            layers = project.layers
+            colors = project.project.palette.paletteList.map {
+                Color(it.toULong())
+            }
         }
     }
 
@@ -124,9 +128,15 @@ fun EditorPage(drawingViewModel: IDrawingViewModel, id: Long) {
                     .padding(paddingValues)
                     .background(Color(0xFF616161))
             ) {
-                DrawCanvas(Modifier.fillMaxSize(), drawingViewModel, { start: Offset, end: Offset ->
-                    drawingViewModel.drawLine(start, end, selectedColor)
-                })
+                DrawCanvas(Modifier.fillMaxSize(), drawingViewModel) { start: Offset, end: Offset ->
+                    Log.d("aaa", "selectedtool $selectedTool")
+                    when (selectedTool) {
+                        3 -> drawingViewModel.drawLine(start, end, selectedColor)
+                        4 -> drawingViewModel.clearLine(start, end)
+                        5 -> selectedColor =
+                            drawingViewModel.pickColorAt(IntOffset(end.x.toInt(), end.y.toInt()))
+                    }
+                }
 
                 Box(
                     modifier = Modifier
@@ -157,7 +167,6 @@ fun EditorPage(drawingViewModel: IDrawingViewModel, id: Long) {
                 Column {
                     ColorPaletteWithPicker(
                         colors = colors,
-                        selectedColor = selectedColor,
                         onColorSelected = { selectedColor = it },
                         onColorAdded = { newColor ->
                             colors = colors + newColor

@@ -1,8 +1,11 @@
 package ua.ipze.kpi.part.services.drawing.view
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
@@ -13,47 +16,87 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.graphics.createBitmap
-import androidx.lifecycle.viewModelScope
 import androidx.core.graphics.get
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import ua.ipze.kpi.part.views.DatabaseViewModel
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 
 private val Tag = DrawingViewModel::class.simpleName ?: ""
 
+val defaultBitmap = createBitmap(100, 100)
+
 class DrawingViewModel() : IDrawingViewModel() {
 
     private val initialized = AtomicBoolean(false)
+    private val ready = AtomicBoolean(false)
 
     override fun initialize(
         historyLength: UInt,
-        widthAmountPixels: UInt,
-        heightAmountPixels: UInt,
         pixelsPerPixelCell: UInt,
-        databaseViewModel: DatabaseViewModel
+        id: Long,
+        databaseViewModel: DatabaseViewModel,
+        closePageOnFailure: () -> Unit
     ) {
         if (!initialized.compareAndSet(false, true)) {
             Log.e(Tag, "Got second init")
             return
         }
-        bitmap = createBitmap(
-            widthAmountPixels.toInt() * pixelsPerPixelCell.toInt(),
-            heightAmountPixels.toInt() * pixelsPerPixelCell.toInt()
-        )
-        canvas = Canvas(bitmap)
-        canvas.drawPaint(Paint().also {
-            it.color = Color(200, 124, 122).toArgb()
-        })
 
-        amountOfSteps = MutableStateFlow(DrawingAmountOfSteps(0u, 0u))
-        this.historyLength = historyLength
-        this.widthAmountPixels = widthAmountPixels
-        this.heightAmountPixels = heightAmountPixels
-        this.pixelsPerPixelCell = pixelsPerPixelCell
-        this.databaseViewModel = databaseViewModel
         this.operativeData = OperativeData(viewModelScope)
+        this.historyLength = historyLength
+        amountOfSteps = MutableStateFlow(DrawingAmountOfSteps(0u, 0u))
+
+        viewModelScope.launch {
+            val data = databaseViewModel.getProjectWithLayers(id)
+            if (data == null) {
+                closePageOnFailure()
+                Log.e(Tag, "Failed to get value from db for id: $id")
+                return@launch
+            }
+
+            widthAmountPixels = data.project.width.toUInt()
+            heightAmountPixels = data.project.height.toUInt()
+
+            val index = 0
+            bitmap = if (data.layers[index].imageData.isEmpty()) {
+                val newBitmap = createBitmap(
+                    (widthAmountPixels * pixelsPerPixelCell).toInt(),
+                    (heightAmountPixels * pixelsPerPixelCell).toInt()
+                )
+                Canvas(newBitmap).drawPaint(Paint().also {
+                    it.color =
+                        if (index == 0) {
+                            Color(data.project.baseColor.toULong()).toArgb()
+                        } else {
+                            Color.Transparent.toArgb()
+                        }
+                })
+                newBitmap
+            } else {
+                val decodedBitmap = BitmapFactory.decodeByteArray(
+                    data.layers[index].imageData, 0,
+                    data.layers[index].imageData.size
+                )?.copy(
+                    Bitmap.Config.ARGB_8888, true
+                )
+                if (decodedBitmap == null) {
+                    closePageOnFailure()
+                    Log.e(Tag, "Failed to decode 1st layer from array id: $id")
+                    return@launch
+                }
+                decodedBitmap
+            }
+
+            canvas = Canvas(bitmap)
+            realPixelsPerDrawPixel = pixelsPerPixelCell
+            databaseView = databaseViewModel
+            ready.set(true)
+            triggerRedraw()
+        }
     }
 
     // ----------------------------------------------------
@@ -65,9 +108,9 @@ class DrawingViewModel() : IDrawingViewModel() {
     private var historyLength: UInt = 0u
     private var widthAmountPixels: UInt = 0u
     private var heightAmountPixels: UInt = 0u
-    private var pixelsPerPixelCell: UInt = 0u
+    private var realPixelsPerDrawPixel: UInt = 0u
     private lateinit var operativeData: OperativeData
-    private lateinit var databaseViewModel: DatabaseViewModel
+    private lateinit var databaseView: DatabaseViewModel
 
     // ----------------------------------------------------
 
@@ -82,6 +125,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     // Internal
 
     override fun __INTERNAL_getCachedBitmapImage(): ImageBitmap {
+        if (!ready.get()) return defaultBitmap.asImageBitmap()
         return bitmap.asImageBitmap()
     }
 
@@ -126,13 +170,15 @@ class DrawingViewModel() : IDrawingViewModel() {
 
 
     override fun drawLine(start: Offset, end: Offset, color: Color) {
+        if (!ready.get()) return
+
         val startScaled = Offset(
-            start.x / this.pixelsPerPixelCell.toInt(),
-            start.y / this.pixelsPerPixelCell.toInt()
+            start.x / this.realPixelsPerDrawPixel.toInt(),
+            start.y / this.realPixelsPerDrawPixel.toInt()
         )
         val endScaled = Offset(
-            end.x / this.pixelsPerPixelCell.toInt(),
-            end.y / this.pixelsPerPixelCell.toInt()
+            end.x / this.realPixelsPerDrawPixel.toInt(),
+            end.y / this.realPixelsPerDrawPixel.toInt()
         )
 
         val scaledPixels = bresenhamLine(
@@ -150,13 +196,16 @@ class DrawingViewModel() : IDrawingViewModel() {
         }
         scaledPixels.forEach {
             val topLeft =
-                Offset(it.x * pixelsPerPixelCell.toFloat(), it.y * pixelsPerPixelCell.toFloat())
+                Offset(
+                    it.x * realPixelsPerDrawPixel.toFloat(),
+                    it.y * realPixelsPerDrawPixel.toFloat()
+                )
             canvas.drawRect(
                 RectF(
                     topLeft.x,
                     topLeft.y,
-                    topLeft.x + pixelsPerPixelCell.toFloat(),
-                    topLeft.y + pixelsPerPixelCell.toFloat(),
+                    topLeft.x + realPixelsPerDrawPixel.toFloat(),
+                    topLeft.y + realPixelsPerDrawPixel.toFloat(),
                 ), paint
             )
         }
@@ -164,30 +213,76 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun clearLine(start: Offset, end: Offset) {
-        drawLine(start, end, Color.Transparent)
+        if (!ready.get()) return
+
+        val startScaled = Offset(
+            start.x / realPixelsPerDrawPixel.toInt(),
+            start.y / realPixelsPerDrawPixel.toInt()
+        )
+        val endScaled = Offset(
+            end.x / realPixelsPerDrawPixel.toInt(),
+            end.y / realPixelsPerDrawPixel.toInt()
+        )
+
+        val scaledPixels = bresenhamLine(
+            startScaled.x.toInt(),
+            startScaled.y.toInt(),
+            endScaled.x.toInt(),
+            endScaled.y.toInt()
+        )
+
+        val paint = Paint().apply {
+            xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+            isAntiAlias = false
+        }
+
+        scaledPixels.forEach {
+            val topLeft = Offset(
+                it.x * realPixelsPerDrawPixel.toFloat(),
+                it.y * realPixelsPerDrawPixel.toFloat()
+            )
+
+            canvas.drawRect(
+                RectF(
+                    topLeft.x,
+                    topLeft.y,
+                    topLeft.x + realPixelsPerDrawPixel.toInt(),
+                    topLeft.y + realPixelsPerDrawPixel.toInt()
+                ),
+                paint
+            )
+        }
+
+        paint.xfermode = null
+        triggerRedraw()
     }
 
     // ----------------------------------------------------
 
 
     override fun pickColorAt(offset: IntOffset): Color {
+        if (!ready.get()) return Color.Transparent
+
         if (widthAmountPixels.toInt() <= offset.x || offset.x < 0) return Color.Transparent
         if (heightAmountPixels.toInt() <= offset.y || offset.y < 0) return Color.Transparent
-        return Color(bitmap[offset.x * pixelsPerPixelCell.toInt(), offset.y * pixelsPerPixelCell.toInt()])
+        return Color(bitmap[offset.x * realPixelsPerDrawPixel.toInt(), offset.y * realPixelsPerDrawPixel.toInt()])
     }
 
     // ----------------------------------------------------
 
 
     override fun startMovePixels(selectArea: Rect) {
+        if (!ready.get()) return
 
     }
 
     override fun movePixels(deltaPath: Offset) {
+        if (!ready.get()) return
 
     }
 
     override fun endMovePixels() {
+        if (!ready.get()) return
 
     }
 
@@ -195,12 +290,17 @@ class DrawingViewModel() : IDrawingViewModel() {
 
 
     override fun stepBack() {
+        if (!ready.get()) return
 
     }
 
-    override fun stepForward() {}
+    override fun stepForward() {
+        if (!ready.get()) return
+
+    }
 
     override fun getAmountOfSteps(): StateFlow<DrawingAmountOfSteps> {
+        if (!ready.get()) return TODO("a")
         return TODO("Provide the return value")
     }
 
@@ -208,26 +308,33 @@ class DrawingViewModel() : IDrawingViewModel() {
 
 
     override fun clearImage() {
+        if (!ready.get()) return
 
     }
 
     // ----------------------------------------------------
 
     override fun load(file: File): Result<Unit> {
+        if (!ready.get()) return Result.failure(IllegalStateException("Model isn't ready"))
 
         return TODO("Provide the return value")
     }
 
     override fun storeToPng(): ByteArray {
+        if (!ready.get()) return ByteArray(0)
 
         return TODO("Provide the return value")
     }
 
     override fun getWidthAmountPixels(): UInt {
+        if (!ready.get()) return 0u
+
         return widthAmountPixels
     }
 
     override fun getHeightAmountPixels(): UInt {
+        if (!ready.get()) return 0u
+
         return heightAmountPixels
     }
 

@@ -93,11 +93,12 @@ fun AppRouter(
                 val drawingViewModel = DrawingViewModel()
                 drawingViewModel.initialize(
                     data.historyLength.toUInt(),
-                    data.drawingHeightPixels.toUInt(),
-                    data.drawingWidthPixels.toUInt(),
-                    8.toUInt(),
-                    databaseViewModel,
-                )
+                    4.toUInt(),
+                    data.id,
+                    databaseViewModel
+                ) {
+                    navController.navigate(GalleryPageData)
+                }
 
                 EditorPage(drawingViewModel, data.id)
             }

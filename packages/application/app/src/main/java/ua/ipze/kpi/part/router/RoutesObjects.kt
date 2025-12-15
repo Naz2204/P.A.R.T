@@ -13,8 +13,6 @@ data object GalleryPageData
 
 @Serializable
 data class EditorPageData(
-    val drawingHeightPixels: Int,
-    val drawingWidthPixels: Int,
     val historyLength: Int,
     val id: Long
 )
