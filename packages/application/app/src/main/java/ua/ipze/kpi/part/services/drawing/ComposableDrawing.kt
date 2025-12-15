@@ -82,7 +82,7 @@ fun DrawCanvas(
             .onSizeChanged {
                 canvasSize = it.toSize()
                 if (wasCentered) return@onSizeChanged
-                wasCentered = true
+                wasCentered = true // correct code, ignore linter
 
                 val scaleX = it.width.toFloat() / anyImage.width
                 val scaleY = it.height.toFloat() / anyImage.height
@@ -96,20 +96,22 @@ fun DrawCanvas(
                 )
             }
     ) {
-        drawImage(
-            image = anyImage,
-            srcOffset = IntOffset.Zero,
-            srcSize = IntSize(
-                anyImage.width,
-                anyImage.height
-            ),
-            dstOffset = IntOffset(lastBitmapPos.value.x.toInt(), lastBitmapPos.value.y.toInt()),
-            dstSize = IntSize(
-                (anyImage.width * scaling.floatValue).toInt(),
-                (anyImage.height * scaling.floatValue).toInt()
-            ),
-            filterQuality = FilterQuality.None
-        )
+        images.asReversed().forEach {
+            drawImage(
+                image = it,
+                srcOffset = IntOffset.Zero,
+                srcSize = IntSize(
+                    anyImage.width,
+                    anyImage.height
+                ),
+                dstOffset = IntOffset(lastBitmapPos.value.x.toInt(), lastBitmapPos.value.y.toInt()),
+                dstSize = IntSize(
+                    (anyImage.width * scaling.floatValue).toInt(),
+                    (anyImage.height * scaling.floatValue).toInt()
+                ),
+                filterQuality = FilterQuality.None
+            )
+        }
     }
 }
 
