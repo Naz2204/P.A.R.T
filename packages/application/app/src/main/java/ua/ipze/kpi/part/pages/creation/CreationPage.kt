@@ -332,6 +332,7 @@ fun CreationPage() {
                             imageData = ByteArray(0)
                         )
                     }
+
                     val project = Project(
                         layers = LayersList(emptyList()),
                         width = width.toIntOrNull() ?: 1,
@@ -339,7 +340,7 @@ fun CreationPage() {
                         name = name,
                         //TODO додати геолокацію
                         lastSettlement = city.toString(),
-                        palette = PaletteList(colorScheme.map { it ->
+                        palette = PaletteList(colorScheme.map {
                             Color(it[0], it[1], it[2]).value.toLong()
                         }),
                         timer = 0,
