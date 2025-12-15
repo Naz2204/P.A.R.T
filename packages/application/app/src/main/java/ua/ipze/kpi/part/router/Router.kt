@@ -83,7 +83,7 @@ fun AppRouter(
                     data.historyLength.toUInt(),
                     data.drawingHeightPixels.toUInt(),
                     data.drawingWidthPixels.toUInt(),
-                    20.toUInt(),
+                    8.toUInt(),
                     databaseViewModel,
                 )
 

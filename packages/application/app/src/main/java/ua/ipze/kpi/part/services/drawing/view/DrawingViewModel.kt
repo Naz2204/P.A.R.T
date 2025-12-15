@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.get
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ua.ipze.kpi.part.views.DatabaseViewModel
@@ -37,7 +38,10 @@ class DrawingViewModel() :
             Log.e(Tag, "Got second init")
             return
         }
-        bitmap = createBitmap(widthAmountPixels.toInt(), heightAmountPixels.toInt())
+        bitmap = createBitmap(
+            widthAmountPixels.toInt() * pixelsPerPixelCell.toInt(),
+            heightAmountPixels.toInt() * pixelsPerPixelCell.toInt()
+        )
         canvas = Canvas(bitmap)
         canvas.drawPaint(Paint().also {
             it.color = Color(200, 124, 122).toArgb()
@@ -158,15 +162,16 @@ class DrawingViewModel() :
     }
 
     override fun clearLine(start: Offset, end: Offset) {
-
+        drawLine(start, end, Color.Transparent)
     }
 
     // ----------------------------------------------------
 
 
-    override fun pickColorAt(offset: Offset): Color {
-
-        return TODO("Provide the return value")
+    override fun pickColorAt(offset: IntOffset): Color {
+        if (widthAmountPixels.toInt() <= offset.x || offset.x < 0) return Color.Transparent
+        if (heightAmountPixels.toInt() <= offset.y || offset.y < 0) return Color.Transparent
+        return Color(bitmap[offset.x * pixelsPerPixelCell.toInt(), offset.y * pixelsPerPixelCell.toInt()])
     }
 
     // ----------------------------------------------------

@@ -185,6 +185,7 @@ suspend fun PointerInputScope.drawAndPanPointerInput(
                     canvasOffset.value += delta
 
                     // Zoom: distance ratio
+                    // TODO: add zoom that persist midpoint
                     val prevDistance = (p1.previousPosition - p2.previousPosition).getDistance()
                     val currentDistance = (p1.position - p2.position).getDistance()
                     val zoomFactor = currentDistance / prevDistance
