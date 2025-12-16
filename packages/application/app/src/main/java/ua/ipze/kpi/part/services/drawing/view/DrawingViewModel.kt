@@ -11,7 +11,6 @@ import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntOffset
@@ -19,15 +18,13 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.get
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import ua.ipze.kpi.part.database.layer.Layer
+import ua.ipze.kpi.part.database.project.Project
 import ua.ipze.kpi.part.views.DatabaseProjectWithLayers
 import ua.ipze.kpi.part.views.DatabaseViewModel
 import java.util.concurrent.atomic.AtomicBoolean
@@ -57,16 +54,16 @@ class DrawingViewModel() : IDrawingViewModel() {
         this.historyLength = historyLength
         amountOfSteps = MutableStateFlow(DrawingAmountOfSteps(0u, 0u))
 
-        val job = viewModelScope.launch {
+        viewModelScope.launch {
             val data = databaseViewModel.getProjectWithLayers(id)
             if (data == null) {
                 closePageOnFailure()
                 Log.e(Tag, "Failed to get value from db for id: $id")
                 return@launch
             }
-
-            widthAmountPixels = data.project.width.toUInt()
-            heightAmountPixels = data.project.height.toUInt()
+            project = data.project
+            widthAmountPixels = project.width.toUInt()
+            heightAmountPixels = project.height.toUInt()
 
             val bitmapResults = data.layers.mapIndexedNotNull { index, value ->
                 getBitmap(
@@ -80,8 +77,8 @@ class DrawingViewModel() : IDrawingViewModel() {
                 closePageOnFailure()
                 return@launch
             }
-            bitmaps = bitmapResults
-            canvases = bitmaps.map { Canvas(it) }
+            bitmaps = bitmapResults.toMutableList()
+            canvases = bitmaps.map { Canvas(it) }.toMutableList()
 
             realPixelsPerDrawPixel = pixelsPerPixelCell
             databaseView = databaseViewModel
@@ -89,23 +86,21 @@ class DrawingViewModel() : IDrawingViewModel() {
             triggerRedraw()
 
 
-            layers = MutableStateFlow(data.layers)
-            activeLayerIndex = MutableStateFlow(0u)
+            layers.value = data.layers
+            activeLayerIndex.value = 0u
 
-            activeLayer = layers.combine(activeLayerIndex) { layersList, index ->
+        }
+
+        // blocking coroutines
+        viewModelScope.launch {
+            layers.combine(activeLayerIndex) { layersList, index ->
                 val i = index.toInt()
                 val layer = if (i in layersList.indices) layersList[i] else null
 
                 if (layer == null) null
                 else CurrentActiveLayer(layer = layer, indexInArray = index)
-            }.stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                null
-            )
+            }.collect({ activeLayer.value = it })
         }
-
-        runBlocking { job.join() }
     }
 
     private fun getBitmap(
@@ -148,8 +143,9 @@ class DrawingViewModel() : IDrawingViewModel() {
     // ----------------------------------------------------
     // data
 
-    private lateinit var bitmaps: List<Bitmap>
-    private lateinit var canvases: List<Canvas>
+    private lateinit var project: Project
+    private lateinit var bitmaps: MutableList<Bitmap>
+    private lateinit var canvases: MutableList<Canvas>
     private lateinit var amountOfSteps: MutableStateFlow<DrawingAmountOfSteps>
     private var historyLength: UInt = 0u
     private var widthAmountPixels: UInt = 0u
@@ -158,22 +154,35 @@ class DrawingViewModel() : IDrawingViewModel() {
     private lateinit var operativeData: OperativeData
     private lateinit var databaseView: DatabaseViewModel
 
-    private lateinit var layers: MutableStateFlow<List<Layer>>
-    private lateinit var activeLayerIndex: MutableStateFlow<UInt>
-    private lateinit var activeLayer: StateFlow<CurrentActiveLayer?>
+    private val layers = MutableStateFlow<List<Layer>>(listOf())
+    private val activeLayerIndex = MutableStateFlow<UInt>(0u)
+
+    private val activeLayer = MutableStateFlow<CurrentActiveLayer?>(null)
 
     // ----------------------------------------------------
     override fun getLayers(): StateFlow<List<Layer>> = layers.asStateFlow()
-    override fun getCurrentActiveLayer(): StateFlow<CurrentActiveLayer?> = activeLayer
     override fun getCurrentActiveLayerIndex(): StateFlow<UInt> = activeLayerIndex.asStateFlow()
 
+    override fun getCurrentActiveLayer(): MutableStateFlow<CurrentActiveLayer?> = activeLayer
+
     override fun addLayer(layer: Layer) {
-        layers.update { return@update listOf(layer) + it }
+        if (!ready.get()) return
+
+        layers.update {
+            bitmaps.add(createBitmap(project.width, project.height))
+            canvases.addLast(Canvas(bitmaps.last()))
+            return@update listOf(layer) + it
+        }
         triggerRedraw()
     }
 
     override fun deleteLayer(index: UInt) {
+        if (!ready.get()) return
+        if (index.toInt() <= bitmaps.size) return
+
         layers.update {
+            bitmaps.removeAt(index.toInt())
+            canvases.removeAt(index.toInt())
             it.toMutableList().filterIndexed { indexFilter, _ -> indexFilter != index.toInt() }
                 .toList()
         }
@@ -181,11 +190,19 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun swapLayers(a: UInt, b: UInt) {
+        if (!ready.get()) return
         layers.update {
             val layersAmount = it.size.toUInt()
             if (a >= layersAmount || b >= layersAmount || a == b) {
                 return@update it
             }
+            val tempBitmap = bitmaps[a.toInt()]
+            bitmaps[a.toInt()] = bitmaps[b.toInt()]
+            bitmaps[b.toInt()] = tempBitmap
+
+            val tempCanvas = canvases[a.toInt()]
+            canvases[a.toInt()] = canvases[b.toInt()]
+            canvases[b.toInt()] = tempCanvas
 
             return@update it.toMutableList().apply {
                 val tmp = this[a.toInt()]
@@ -198,10 +215,13 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun setActiveLayer(index: UInt) {
+        if (!ready.get()) return
         activeLayerIndex.value = index
     }
 
     override fun setVisibilityOfLayer(index: UInt, isVisible: Boolean) {
+        if (!ready.get()) return
+
         val i = index.toInt()
         layers.value = layers.value.mapIndexed { idx, layer ->
             if (idx == i) layer.copy(visibility = isVisible)
@@ -211,6 +231,8 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun setLockOnLayer(index: UInt, isLocked: Boolean) {
+        if (!ready.get()) return
+
         val i = index.toInt()
         layers.value = layers.value.mapIndexed { idx, layer ->
             if (idx == i) layer.copy(lock = isLocked)
@@ -231,9 +253,14 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     // Internal
 
-    override fun __INTERNAL_getCachedBitmapImage(): List<ImageBitmap> {
-        if (!ready.get()) return listOf(defaultBitmap.asImageBitmap())
-        return bitmaps.map { it.asImageBitmap() }
+    override fun __INTERNAL_getCachedBitmapImage(): List<CachedBitmapImage> {
+        if (!ready.get()) return listOf(CachedBitmapImage(defaultBitmap.asImageBitmap(), true))
+        return bitmaps.mapIndexed { index, it ->
+            CachedBitmapImage(
+                it.asImageBitmap(),
+                layers.value.getOrNull(index)?.visibility ?: false
+            )
+        }
     }
 
     override val __INTERNAL_bitmapVersion = MutableStateFlow(0u)
@@ -278,6 +305,13 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     override fun drawLine(start: Offset, end: Offset, color: Color) {
         if (!ready.get()) return
+        if (activeLayerIndex.value.toInt() >= canvases.size) {
+            Log.i(
+                Tag,
+                "Skipping drawing line, because queried canvas " +
+                        "(index: ${activeLayerIndex.value}) is out of bounds of array of canvases"
+            )
+        }
 
         val startScaled = Offset(
             start.x / this.realPixelsPerDrawPixel.toInt(),
@@ -321,6 +355,13 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     override fun clearLine(start: Offset, end: Offset) {
         if (!ready.get()) return
+        if (activeLayerIndex.value.toInt() >= canvases.size) {
+            Log.i(
+                Tag,
+                "Skipping cleaning line, because queried canvas " +
+                        "(index: ${activeLayerIndex.value}) is out of bounds of array of canvases"
+            )
+        }
 
         val startScaled = Offset(
             start.x / realPixelsPerDrawPixel.toInt(),
@@ -369,6 +410,13 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     override fun pickColorAt(offset: IntOffset): Color {
         if (!ready.get()) return Color.Transparent
+        if (activeLayerIndex.value.toInt() >= canvases.size) {
+            Log.i(
+                Tag,
+                "Skipping picking color, because queried canvas " +
+                        "(index: ${activeLayerIndex.value}) is out of bounds of array of canvases"
+            )
+        }
 
         if (widthAmountPixels.toInt() <= offset.x || offset.x < 0) return Color.Transparent
         if (heightAmountPixels.toInt() <= offset.y || offset.y < 0) return Color.Transparent

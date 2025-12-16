@@ -13,6 +13,7 @@ import ua.ipze.kpi.part.views.DatabaseViewModel
 
 data class DrawingAmountOfSteps(val backward: UInt, val forward: UInt)
 data class CurrentActiveLayer(val layer: Layer, val indexInArray: UInt)
+data class CachedBitmapImage(val image: ImageBitmap, val isVisible: Boolean)
 
 abstract class IDrawingViewModel() : ViewModel() {
     // construct
@@ -77,7 +78,7 @@ abstract class IDrawingViewModel() : ViewModel() {
 
     // internal DON'T USE
     @Suppress("FunctionName")
-    abstract fun __INTERNAL_getCachedBitmapImage(): List<ImageBitmap>
+    abstract fun __INTERNAL_getCachedBitmapImage(): List<CachedBitmapImage>
 
     @Suppress("PropertyName")
     abstract val __INTERNAL_bitmapVersion: MutableStateFlow<UInt>

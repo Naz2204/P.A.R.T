@@ -26,10 +26,11 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
+import ua.ipze.kpi.part.services.drawing.view.CachedBitmapImage
 import ua.ipze.kpi.part.services.drawing.view.IDrawingViewModel
 
 @Composable
-private fun IDrawingViewModel.rememberImage(): List<ImageBitmap> {
+private fun IDrawingViewModel.rememberImage(): List<CachedBitmapImage> {
     val changed by this.__INTERNAL_bitmapVersion.collectAsState()
     return remember(changed) { this.__INTERNAL_getCachedBitmapImage() }
 }
@@ -73,13 +74,13 @@ fun DrawCanvas(
     var canvasSize by remember { mutableStateOf(Size(1f, 1f)) }
 
     val firstOrNull = images.getOrNull(0)
-    LaunchedEffect(firstOrNull?.width, firstOrNull?.height) {
+    LaunchedEffect(firstOrNull?.image?.width, firstOrNull?.image?.height) {
         wasCentered = false
     }
 
 
     if (images.isEmpty()) return
-    val anyImage = images[0]
+    val anyImage = images[0].image
 
     Canvas(
         modifier = modifier
@@ -110,21 +111,25 @@ fun DrawCanvas(
             }
     ) {
         images.asReversed().forEach {
-            
-            drawImage(
-                image = it,
-                srcOffset = IntOffset.Zero,
-                srcSize = IntSize(
-                    anyImage.width,
-                    anyImage.height
-                ),
-                dstOffset = IntOffset(lastBitmapPos.value.x.toInt(), lastBitmapPos.value.y.toInt()),
-                dstSize = IntSize(
-                    (anyImage.width * scaling.floatValue).toInt(),
-                    (anyImage.height * scaling.floatValue).toInt()
-                ),
-                filterQuality = FilterQuality.None
-            )
+            if (it.isVisible) {
+                drawImage(
+                    image = it.image,
+                    srcOffset = IntOffset.Zero,
+                    srcSize = IntSize(
+                        anyImage.width,
+                        anyImage.height
+                    ),
+                    dstOffset = IntOffset(
+                        lastBitmapPos.value.x.toInt(),
+                        lastBitmapPos.value.y.toInt()
+                    ),
+                    dstSize = IntSize(
+                        (anyImage.width * scaling.floatValue).toInt(),
+                        (anyImage.height * scaling.floatValue).toInt()
+                    ),
+                    filterQuality = FilterQuality.None
+                )
+            }
         }
     }
 }
