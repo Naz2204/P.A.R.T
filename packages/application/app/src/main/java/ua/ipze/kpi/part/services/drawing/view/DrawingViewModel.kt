@@ -504,9 +504,14 @@ class DrawingViewModel() : IDrawingViewModel() {
             )
         }
 
-        if (widthAmountPixels.toInt() <= offset.x || offset.x < 0) return Color.Transparent
-        if (heightAmountPixels.toInt() <= offset.y || offset.y < 0) return Color.Transparent
-        return Color(bitmaps[activeLayerIndex.value.toInt()][offset.x * realPixelsPerDrawPixel.toInt(), offset.y * realPixelsPerDrawPixel.toInt()])
+        Log.d(
+            Tag,
+            "Get colour from ${offset.x}, ${offset.y} and bitmap size is ${bitmaps[activeLayerIndex.value.toInt()].width}, ${bitmaps[activeLayerIndex.value.toInt()].height}"
+        )
+
+        if ((widthAmountPixels * realPixelsPerDrawPixel).toInt() <= offset.x || offset.x < 0) return Color.Transparent
+        if ((heightAmountPixels * realPixelsPerDrawPixel).toInt() <= offset.y || offset.y < 0) return Color.Transparent
+        return Color(bitmaps[activeLayerIndex.value.toInt()][offset.x, offset.y])
     }
 
     // ----------------------------------------------------
