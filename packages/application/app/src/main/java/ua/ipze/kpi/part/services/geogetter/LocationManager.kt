@@ -1,10 +1,16 @@
 package ua.ipze.kpi.part.services.geogetter
 
 import android.content.Context
+import android.location.Address
 import android.location.Geocoder
+import android.os.Build
 import android.os.Looper
-import com.google.android.gms.location.*
-import java.util.Locale
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 class LocationManager(private val context: Context) {
     private val fusedLocationClient: FusedLocationProviderClient =
@@ -15,7 +21,7 @@ class LocationManager(private val context: Context) {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location ->
                     if (location != null) {
-                        getCityName(location.latitude, location.longitude, onResult)
+                        getLocationName(location.latitude, location.longitude, onResult)
                     } else {
                         requestCurrentLocation(onResult)
                     }
@@ -38,7 +44,7 @@ class LocationManager(private val context: Context) {
             val locationCallback = object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
                     result.lastLocation?.let { location ->
-                        getCityName(location.latitude, location.longitude, onResult)
+                        getLocationName(location.latitude, location.longitude, onResult)
                     } ?: run {
                         onResult("Could not get location")
                     }
@@ -55,16 +61,39 @@ class LocationManager(private val context: Context) {
         }
     }
 
-    private fun getCityName(lat: Double, lon: Double, onResult: (String) -> Unit) {
+    private fun getLocationName(lat: Double, lon: Double, onResult: (String) -> Unit) {
         try {
-            val geocoder = Geocoder(context, Locale.getDefault())
-            val addresses = geocoder.getFromLocation(lat, lon, 1)
+            val geocoder = Geocoder(context)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                geocoder.getFromLocation(
+                    lat,
+                    lon,
+                    1,
+                    object : Geocoder.GeocodeListener {
+                        override fun onGeocode(addresses: MutableList<Address>) {
+                            val address = addresses.firstOrNull()
+                            val city = address?.locality ?: "Unknown city"
+                            val country = address?.countryName ?: "Unknown country"
+                            onResult("$city, $country")
+                        }
 
-            if (!addresses.isNullOrEmpty()) {
-                val city = addresses[0].locality ?: addresses[0].subAdminArea ?: "Unknown"
-                onResult("You are in: $city")
+                        override fun onError(errorMessage: String?) {
+                            onResult("Error: $errorMessage")
+                        }
+                    }
+                )
             } else {
-                onResult("City not found")
+                @Suppress("DEPRECATION")
+                try {
+                    val address = geocoder
+                        .getFromLocation(lat, lon, 1)?.firstOrNull()
+
+                    val city = address?.locality ?: "Unknown city"
+                    val country = address?.countryName ?: "Unknown country"
+                    onResult("$city, $country")
+                } catch (e: Exception) {
+                    onResult("Error")
+                }
             }
         } catch (e: Exception) {
             onResult("Error: ${e.message}")

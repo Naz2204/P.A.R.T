@@ -177,9 +177,9 @@ fun MenuDialog(onDismiss: () -> Unit) {
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-                val city by data.locationViewModel.city.collectAsState()
+                val location by data.locationViewModel.location.collectAsState()
                 Text(
-                    text = city.toString(),
+                    text = location.toString(),
                     color = Color(0xFF9E9E9E),
                     fontSize = 12.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)

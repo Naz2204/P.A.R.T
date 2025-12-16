@@ -325,7 +325,7 @@ fun CreationPage() {
             }
         }
 
-        val city by data.locationViewModel.city.collectAsState()
+        val city by data.locationViewModel.location.collectAsState()
 //        val isLoading by data.locationViewModel.isLoading.collectAsState()
 
         Spacer(modifier = Modifier.weight(0.8f))
