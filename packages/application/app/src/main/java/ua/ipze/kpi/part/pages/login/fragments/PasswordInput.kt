@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ua.ipze.kpi.part.R
+import ua.ipze.kpi.part.ui.theme.pixelBorder
 
 @Composable
 fun PasswordInput(
@@ -37,32 +38,27 @@ fun PasswordInput(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    borderColor: Color
+    borderColor: List<Color>
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
-            style = TextStyle(
-                color = Color.White,
-                fontSize = 14.sp
-            ),
-            modifier = Modifier.padding(bottom = 12.dp)
+            fontSize = 18.sp,
+            color = Color(0xffffffff),
+            modifier = Modifier.padding(bottom = 6.dp)
         )
 
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp)
-                .border(3.dp, borderColor, RoundedCornerShape(6.dp)),
-            color = Color(0xFF2D3748),
-            shape = RoundedCornerShape(6.dp)
+                .pixelBorder(borderWidth = 3.dp, outerColor = borderColor[0],
+                    innerColor = borderColor[1], backgroundColor = Color(0xff53565a)),
+            color = Color(0xff53565a)
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(modifier = Modifier.weight(1f)) {
@@ -95,8 +91,8 @@ fun PasswordInput(
                     Icon(
                         painter = painterResource(if (passwordVisible) R.drawable.open_eye else R.drawable.hidden_eye),
                         contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                        tint = Color(0xFF94A3B8),
-                        modifier = Modifier.size(22.dp)
+                        tint = Color(0xffffffff),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }

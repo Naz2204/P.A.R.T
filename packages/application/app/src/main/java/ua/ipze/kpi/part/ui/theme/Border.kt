@@ -7,6 +7,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -40,3 +41,26 @@ fun Modifier.pixelBorder(
         )
     }
 ).padding(borderWidth * 2).background(backgroundColor)
+
+fun Modifier.topBottomBorder(strokeWidth: Dp, borderColor: Color, backgroundColor: Color = Color.DarkGray,): Modifier = this.then(
+    Modifier.drawBehind {
+        val strokeWidthPx = strokeWidth.toPx()
+
+        val w = size.width
+        val h = size.height
+
+        drawLine(
+            color = borderColor,
+            start = Offset(x = 0f, y = 0f - strokeWidthPx/2),
+            end = Offset(x = w , y = 0f - strokeWidthPx/2),
+            strokeWidth = strokeWidthPx
+        )
+
+        drawLine(
+            color = borderColor,
+            start = Offset(x = 0f, y = h + strokeWidthPx/2),
+            end = Offset(x = w , y = h + strokeWidthPx/2),
+            strokeWidth = strokeWidthPx
+        )
+    }.background(backgroundColor)
+)
