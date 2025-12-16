@@ -42,7 +42,7 @@ abstract class IDrawingViewModel() : ViewModel() {
     abstract fun setVisibilityOfLayer(index: UInt, isVisible: Boolean)
     abstract fun setLockOnLayer(index: UInt, isLocked: Boolean)
     abstract fun setLayerName(index: UInt, name: String)
-    abstract fun getPalette(): StateFlow<PaletteList>
+    abstract fun getPalette(): StateFlow<List<Color>>
     abstract fun setPalette(colors: List<Color>)
 
     // line drawing

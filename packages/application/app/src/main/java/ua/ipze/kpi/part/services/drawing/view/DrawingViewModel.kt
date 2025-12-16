@@ -186,7 +186,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     private lateinit var operativeData: OperativeData
     private lateinit var databaseView: DatabaseViewModel
 
-    private val palette = MutableStateFlow<PaletteList>(PaletteList(emptyList()))
+    private val palette = MutableStateFlow<List<Color>>(emptyList())
 
     private val layers = MutableStateFlow<List<Layer>>(emptyList())
     private val activeLayerIndex = MutableStateFlow<UInt>(0u)
@@ -291,10 +291,10 @@ class DrawingViewModel() : IDrawingViewModel() {
         }
     }
 
-    override fun getPalette(): StateFlow<PaletteList> = palette.asStateFlow()
+    override fun getPalette(): StateFlow<List<Color>> = palette.asStateFlow()
 
     override fun setPalette(colors: List<Color>) {
-        palette.value = PaletteList(colors.map { it.value.toLong() })
+        palette.value = colors
     }
 
     // ----------------------------------------------------
@@ -302,7 +302,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     private suspend fun saveStep() {
         if (!ready.get()) return
         databaseView.saveProject(
-            project.copy(palette = palette.value),
+            project.copy(palette = PaletteList(palette.value.map { it.value.toLong() })),
             layers.value.mapIndexed { index, layer ->
                 val bitmap = bitmaps[index]
                 val stream = ByteArrayOutputStream()
