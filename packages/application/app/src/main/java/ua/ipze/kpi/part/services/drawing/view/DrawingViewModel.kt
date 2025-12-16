@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
+import android.os.SystemClock.sleep
 import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -17,12 +18,16 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.get
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.database.project.Project
@@ -40,6 +45,13 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     private val initialized = AtomicBoolean(false)
     private val ready = AtomicBoolean(false)
+
+    private val cleanupScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    init {
+        Log.d("ViewModelScope", "ViewModel CREATED - HashCode: ${this.hashCode()}")
+        Log.d("ViewModelScope", "ViewModel instance: $this")
+    }
 
     override fun initialize(
         historyLength: UInt,
@@ -110,12 +122,10 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun onCleared() {
-        Log.d("aaa", "mew")
-        // Run final save
-        viewModelScope.launch {
+        cleanupScope.launch {
             saveStep()
+            cleanupScope.cancel()
         }
-
         super.onCleared()
     }
 
@@ -159,7 +169,10 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     private fun startAutoSaves(interval: Duration) {
         viewModelScope.launch(Dispatchers.IO) {
-
+            while (isActive) {
+                saveStep()
+                sleep(interval.toMillis())
+            }
         }
     }
 
@@ -281,19 +294,19 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
     // ----------------------------------------------------
 
-    private fun saveStep() {
+    private suspend fun saveStep() {
+        Log.d(Tag, "Entered")
         if (!ready.get()) return
-        viewModelScope.launch(Dispatchers.IO) {
-            databaseView.saveProject(
-                project,
-                layers.value.mapIndexed { index, layer ->
-                    val bitmap = bitmaps[index]
-                    val stream = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                    layer.copy(imageData = stream.toByteArray())
-                }.toList()
-            )
-        }
+        Log.d(Tag, "Passed ready")
+        databaseView.saveProject(
+            project,
+            layers.value.mapIndexed { index, layer ->
+                val bitmap = bitmaps[index]
+                val stream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                layer.copy(imageData = stream.toByteArray())
+            }.toList()
+        )
     }
 
     private fun triggerRedraw() {

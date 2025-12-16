@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,7 +18,6 @@ import ua.ipze.kpi.part.pages.login.LoginPage
 import ua.ipze.kpi.part.pages.login.PasswordCreationPage
 import ua.ipze.kpi.part.providers.basePageData.BasePageData
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
-import ua.ipze.kpi.part.services.drawing.view.DrawingViewModel
 import ua.ipze.kpi.part.services.geogetter.LocationViewModel
 import ua.ipze.kpi.part.utils.Biometry
 import ua.ipze.kpi.part.views.DatabaseViewModel
@@ -56,7 +54,7 @@ fun AppRouter(
 //                historyLength = 1,
 //                id = 0
 //            ),
-            startDestination = CreateArtPageData,
+            startDestination = GalleryPageData,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -91,17 +89,14 @@ fun AppRouter(
             composable<GalleryPageData> { GalleryPage(passwordViewModel) }
             composable<EditorPageData> {
                 val data = it.toRoute<EditorPageData>()
-                val drawingViewModel: DrawingViewModel = viewModel(it)
-                drawingViewModel.initialize(
-                    data.historyLength.toUInt(),
-                    4.toUInt(),
-                    data.id,
-                    databaseViewModel
-                ) {
-                    navController.navigate(GalleryPageData)
-                }
+//
+//                val localOwner = LocalViewModelStoreOwner.current
+//
+//                Log.d("ViewModelScope", "ViewModelStoreOwner: ${localOwner?.javaClass?.simpleName}")
+//                Log.d("ViewModelScope", "Owner hashCode: ${localOwner?.hashCode()}")
 
-                EditorPage(drawingViewModel, data.id)
+
+                EditorPage(data, databaseViewModel, data.id)
             }
         }
     }

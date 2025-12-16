@@ -53,6 +53,7 @@ import ua.ipze.kpi.part.database.project.LayersList
 import ua.ipze.kpi.part.database.project.PaletteList
 import ua.ipze.kpi.part.database.project.Project
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
+import ua.ipze.kpi.part.router.CreateArtPageData
 import ua.ipze.kpi.part.router.EditorPageData
 import ua.ipze.kpi.part.services.paletteApi.PaletteViewModel
 import ua.ipze.kpi.part.services.qrWorker.QRDialog
@@ -370,7 +371,11 @@ fun CreationPage() {
                                 historyLength = 0,
                                 id = id
                             )
-                        )
+                        ) {
+                            popUpTo(CreateArtPageData) {
+                                inclusive = true
+                            }
+                        }
                     }
                 })
 
