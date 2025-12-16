@@ -45,7 +45,7 @@ val defaultBitmap = createBitmap(100, 100)
 class DrawingViewModel() : IDrawingViewModel() {
 
     private val initialized = AtomicBoolean(false)
-    private val ready = AtomicBoolean(false)
+    private val ready = MutableStateFlow(false)
 
     private val cleanupScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
@@ -94,7 +94,7 @@ class DrawingViewModel() : IDrawingViewModel() {
 
             realPixelsPerDrawPixel = pixelsPerPixelCell
             databaseView = databaseViewModel
-            ready.set(true)
+            ready.value = true
             triggerRedraw()
 
 
@@ -117,6 +117,8 @@ class DrawingViewModel() : IDrawingViewModel() {
 
         startAutoSaves(Duration.ofMinutes(1))
     }
+
+    override fun isReady(): StateFlow<Boolean> = ready.asStateFlow()
 
     override fun onCleared() {
         cleanupScope.launch {
@@ -202,7 +204,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     override fun getCurrentActiveLayer(): MutableStateFlow<CurrentActiveLayer?> = activeLayer
 
     override fun addLayer(layer: Layer) {
-        if (!ready.get()) return
+        if (!ready.value) return
 
         layers.update {
             bitmaps.add(
@@ -219,7 +221,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun deleteLayer(index: UInt) {
-        if (!ready.get()) return
+        if (!ready.value) return
         if (index.toInt() >= bitmaps.size) return
 
         layers.update {
@@ -232,7 +234,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun swapLayers(a: UInt, b: UInt) {
-        if (!ready.get()) return
+        if (!ready.value) return
         layers.update {
             val layersAmount = it.size.toUInt()
             if (a >= layersAmount || b >= layersAmount || a == b) {
@@ -257,12 +259,12 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun setActiveLayer(index: UInt) {
-        if (!ready.get()) return
+        if (!ready.value) return
         activeLayerIndex.value = index
     }
 
     override fun setVisibilityOfLayer(index: UInt, isVisible: Boolean) {
-        if (!ready.get()) return
+        if (!ready.value) return
 
         val i = index.toInt()
         layers.value = layers.value.mapIndexed { idx, layer ->
@@ -273,7 +275,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun setLockOnLayer(index: UInt, isLocked: Boolean) {
-        if (!ready.get()) return
+        if (!ready.value) return
 
         val i = index.toInt()
         layers.value = layers.value.mapIndexed { idx, layer ->
@@ -283,7 +285,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun setLayerName(index: UInt, name: String) {
-        if (!ready.get()) return
+        if (!ready.value) return
 
         val i = index.toInt()
         layers.value = layers.value.mapIndexed { idx, layer ->
@@ -301,7 +303,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     // ----------------------------------------------------
 
     private suspend fun saveStep() {
-        if (!ready.get()) return
+        if (!ready.value) return
         databaseView.saveProject(
             project.copy(palette = PaletteList(palette.value.map { it.value.toLong() })),
             layers.value.mapIndexed { index, layer ->
@@ -321,7 +323,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     // Internal
 
     override fun __INTERNAL_getCachedBitmapImage(): List<CachedBitmapImage> {
-        if (!ready.get()) return listOf(CachedBitmapImage(defaultBitmap.asImageBitmap(), true))
+        if (!ready.value) return listOf(CachedBitmapImage(defaultBitmap.asImageBitmap(), true))
         return bitmaps.mapIndexed { index, it ->
             CachedBitmapImage(
                 it.asImageBitmap(),
@@ -371,7 +373,7 @@ class DrawingViewModel() : IDrawingViewModel() {
 
 
     override fun drawLine(start: Offset, end: Offset, color: Color) {
-        if (!ready.get()) return
+        if (!ready.value) return
         if (activeLayerIndex.value.toInt() >= canvases.size) {
             Log.e(
                 Tag,
@@ -423,7 +425,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     override fun clearLine(start: Offset, end: Offset) {
-        if (!ready.get()) return
+        if (!ready.value) return
         if (activeLayerIndex.value.toInt() >= canvases.size) {
             Log.i(
                 Tag,
@@ -478,7 +480,7 @@ class DrawingViewModel() : IDrawingViewModel() {
 
 
     override fun pickColorAt(offset: IntOffset): Color {
-        if (!ready.get()) return Color.Transparent
+        if (!ready.value) return Color.Transparent
         if (activeLayerIndex.value.toInt() >= canvases.size) {
             Log.i(
                 Tag,
@@ -496,17 +498,17 @@ class DrawingViewModel() : IDrawingViewModel() {
 
 
     override fun startMovePixels(selectArea: Rect) {
-        if (!ready.get()) return
+        if (!ready.value) return
 
     }
 
     override fun movePixels(deltaPath: Offset) {
-        if (!ready.get()) return
+        if (!ready.value) return
 
     }
 
     override fun endMovePixels() {
-        if (!ready.get()) return
+        if (!ready.value) return
 
     }
 
@@ -514,38 +516,56 @@ class DrawingViewModel() : IDrawingViewModel() {
 
 
     override fun stepBack() {
-        if (!ready.get()) return
+        if (!ready.value) return
 
     }
 
     override fun stepForward() {
-        if (!ready.get()) return
+        if (!ready.value) return
 
     }
 
     override fun getAmountOfSteps(): StateFlow<DrawingAmountOfSteps> {
-        if (!ready.get()) return TODO("a")
+        if (!ready.value) return TODO("a")
         return TODO("Provide the return value")
     }
 
     // ----------------------------------------------------
 
     override fun clearImage() {
-        if (!ready.get()) return
+        if (!ready.value) return
 
+    }
+
+    override fun toPng(): ByteArray {
+        if (!ready.value) return ByteArray(0)
+        val resultBitmap = createBitmap(
+            (widthAmountPixels * realPixelsPerDrawPixel).toInt(),
+            (heightAmountPixels * realPixelsPerDrawPixel).toInt()
+        )
+        val canvas = Canvas(resultBitmap)
+
+        bitmaps.reversed().forEach {
+            canvas.drawBitmap(it, 0f, 0f, null)
+        }
+
+        val stream = ByteArrayOutputStream()
+        resultBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+
+        return stream.toByteArray()
     }
 
     // ----------------------------------------------------
 
 
     override fun getWidthAmountPixels(): UInt {
-        if (!ready.get()) return 0u
+        if (!ready.value) return 0u
 
         return widthAmountPixels
     }
 
     override fun getHeightAmountPixels(): UInt {
-        if (!ready.get()) return 0u
+        if (!ready.value) return 0u
 
         return heightAmountPixels
     }

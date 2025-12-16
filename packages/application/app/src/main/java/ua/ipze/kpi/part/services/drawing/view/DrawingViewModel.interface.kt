@@ -26,6 +26,11 @@ abstract class IDrawingViewModel() : ViewModel() {
         closePageOnFailure: () -> Unit
     )
 
+    /**
+     * Describes if is [initialize] is finished (return false in other)
+     */
+    abstract fun isReady(): StateFlow<Boolean>
+
     // data
     abstract fun getWidthAmountPixels(): UInt
     abstract fun getCurrentActiveLayerIndex(): StateFlow<UInt>
@@ -73,6 +78,8 @@ abstract class IDrawingViewModel() : ViewModel() {
 
     // clear image
     abstract fun clearImage()
+
+    abstract fun toPng(): ByteArray
 
     // internal DON'T USE
     @Suppress("FunctionName")
