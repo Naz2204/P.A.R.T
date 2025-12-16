@@ -21,6 +21,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -45,45 +47,41 @@ import ua.ipze.kpi.part.router.EditorPageData
 import ua.ipze.kpi.part.router.GalleryPageData
 import ua.ipze.kpi.part.services.drawing.DrawCanvas
 import ua.ipze.kpi.part.services.drawing.view.DrawingViewModel
-import ua.ipze.kpi.part.views.DatabaseProjectWithLayers
 import ua.ipze.kpi.part.views.DatabaseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorPage(_data: EditorPageData, databaseViewModel: DatabaseViewModel, id: Long) {
+fun EditorPage(editorPageData: EditorPageData, databaseViewModel: DatabaseViewModel) {
 
     val data = BasePageDataProvider.current
 
     val drawingViewModel: DrawingViewModel = viewModel()
 
-    drawingViewModel.initialize(
-        _data.historyLength.toUInt(),
-        4.toUInt(),
-        _data.id,
-        databaseViewModel
-    ) {
-        data.nav.navigate(GalleryPageData)
+    LaunchedEffect(Unit) {
+        drawingViewModel.initialize(
+            editorPageData.historyLength.toUInt(),
+            4.toUInt(),
+            editorPageData.id,
+            databaseViewModel
+        ) {
+            data.nav.navigate(GalleryPageData)
+        }
     }
-
-
-    var projectData by remember { mutableStateOf<DatabaseProjectWithLayers?>(null) }
 
     var showMenu by remember { mutableStateOf(false) }
     var showColorPalette by remember { mutableStateOf(false) }
     var showLayers by remember { mutableStateOf(false) }
     var layerHidden by remember { mutableStateOf(false) }
     var selectedTool by remember { mutableIntStateOf(3) }
+    val colors = drawingViewModel.getPalette().collectAsState()
     var selectedColor by remember {
         mutableStateOf(
-            Color(
-                projectData?.project?.palette?.paletteList[0] ?: 0xffffffff
-            )
+            colors.value.getOrNull(0) ?: Color.Transparent
         )
     }
-    var colors =
 
 //    LayersPanel(layerItems = layers)
-
+    if (drawingViewModel.isReady().value) {
         Box(modifier = Modifier.fillMaxSize()) {
             Scaffold(
                 modifier = Modifier
@@ -177,14 +175,14 @@ fun EditorPage(_data: EditorPageData, databaseViewModel: DatabaseViewModel, id: 
                 ) {
                     Column {
                         ColorPaletteWithPicker(
-                            colors = colors,
+                            colors = colors.value,
                             onColorSelected = { selectedColor = it },
                             onColorAdded = { newColor ->
-                                colors = colors + newColor
-                                Log.d("color", colors.size.toString())
+                                drawingViewModel.setPalette(colors.value + newColor)
+                                Log.d("color", colors.value.size.toString())
                             },
                             onColorDeleted = { index ->
-                                colors = colors.filterIndexed { i, _ -> i != index }
+                                drawingViewModel.setPalette(colors.value.filterIndexed { i, _ -> i != index })
                             },
                             onCloseClick = { showColorPalette = false }
                         )
@@ -215,13 +213,14 @@ fun EditorPage(_data: EditorPageData, databaseViewModel: DatabaseViewModel, id: 
 
             // Menu Dialog
             if (showMenu) {
-                MenuDialog(onDismiss = {
+                MenuDialog(drawingViewModel, onDismiss = {
                     showMenu = false
                     drawingViewModel.getOperativeData().start()
                 })
                 drawingViewModel.getOperativeData().pause()
             }
         }
+    }
 }
 
 

@@ -360,7 +360,9 @@ fun CreationPage() {
                         }),
                         timer = 0,
                         lastModified = epochTime,
-                        baseColor = selectedBg.value.toLong()
+                        baseColor = selectedBg.value.toLong(),
+                        previewImageData = ByteArray(0),
+                        drawingTime = 0
                     )
                     Log.d("db_test", "Palette ${project.palette}")
 

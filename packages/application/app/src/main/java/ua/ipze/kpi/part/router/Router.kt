@@ -96,7 +96,7 @@ fun AppRouter(
 //                Log.d("ViewModelScope", "Owner hashCode: ${localOwner?.hashCode()}")
 
 
-                EditorPage(data, databaseViewModel, data.id)
+                EditorPage(data, databaseViewModel)
             }
         }
     }

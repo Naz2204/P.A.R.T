@@ -124,6 +124,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     override fun onCleared() {
         cleanupScope.launch {
             saveStep()
+            operativeData.stop()
             cleanupScope.cancel()
         }
         super.onCleared()
@@ -302,6 +303,12 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     // ----------------------------------------------------
+
+    fun saveProject() {
+        cleanupScope.launch {
+            saveStep()
+        }
+    }
 
     private suspend fun saveStep() {
         if (!ready.value) return

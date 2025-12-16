@@ -30,11 +30,12 @@ import ua.ipze.kpi.part.R
 import ua.ipze.kpi.part.providers.MainActivityDataProvider
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.router.GalleryPageData
+import ua.ipze.kpi.part.services.drawing.view.DrawingViewModel
 import ua.ipze.kpi.part.ui.theme.topBottomBorder
 import ua.ipze.kpi.part.views.localizedStringResource
 
 @Composable
-fun MenuDialog(onDismiss: () -> Unit) {
+fun MenuDialog(drawingViewModel: DrawingViewModel, onDismiss: () -> Unit) {
     val data = BasePageDataProvider.current
     val activity = MainActivityDataProvider.current
     var language by remember { mutableStateOf("en") }
@@ -96,6 +97,28 @@ fun MenuDialog(onDismiss: () -> Unit) {
                 ) {
                     Text(
                         text = localizedStringResource(R.string.export, data.language),
+                        color = Color(0xffffffff),
+                        fontSize = 16.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+//                        .fillMaxWidth()
+                        .clickable {
+                            drawingViewModel.saveProject()
+                            onDismiss()
+                        }
+                        .topBottomBorder(
+                            strokeWidth = 4.dp,
+                            borderColor = Color(0xffffffff),
+                            backgroundColor = Color.Transparent
+                        )
+                        .padding(vertical = 10.dp)
+                ) {
+                    Text(
+                        text = localizedStringResource(R.string.save, data.language),
                         color = Color(0xffffffff),
                         fontSize = 16.sp,
                         modifier = Modifier.fillMaxWidth()
