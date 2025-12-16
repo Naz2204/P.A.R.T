@@ -66,7 +66,8 @@ class DrawingViewModel() : IDrawingViewModel() {
         amountOfSteps = MutableStateFlow(DrawingAmountOfSteps(0u, 0u))
 
         viewModelScope.launch(Dispatchers.IO) {
-            val data = databaseViewModel.getProjectWithLayers(id)
+            databaseView = databaseViewModel
+            val data = databaseView.getProjectWithLayers(id)
             if (data == null) {
                 closePageOnFailure()
                 Log.e(Tag, "Failed to get value from db for id: $id")
@@ -93,13 +94,13 @@ class DrawingViewModel() : IDrawingViewModel() {
             canvases = bitmaps.map { Canvas(it) }.toMutableList()
 
             realPixelsPerDrawPixel = pixelsPerPixelCell
-            databaseView = databaseViewModel
             ready.value = true
             triggerRedraw()
 
 
             palette.value = data.project.palette.paletteList.map { Color(it.toULong()) }
             layers.value = data.layers
+            operativeData.setTime(data.project.drawingTime)
             activeLayerIndex.value = 0u
 
         }
@@ -305,7 +306,12 @@ class DrawingViewModel() : IDrawingViewModel() {
     private suspend fun saveStep() {
         if (!ready.value) return
         databaseView.saveProject(
-            project.copy(palette = PaletteList(palette.value.map { it.value.toLong() })),
+            project.copy(
+                palette = PaletteList(
+                    palette.value.map { it.value.toLong() },
+                ), previewImageData = toPng(),
+                drawingTime = operativeData.time.value
+            ),
             layers.value.mapIndexed { index, layer ->
                 val bitmap = bitmaps[index]
                 val stream = ByteArrayOutputStream()

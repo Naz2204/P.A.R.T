@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class OperativeData(viewModelScope: CoroutineScope, oldTime: Int = 0) {
+class OperativeData(viewModelScope: CoroutineScope, oldTime: Long = 0) {
     private val viewModelScope = viewModelScope
     private val _time = MutableStateFlow(oldTime)
-    val time: StateFlow<Int> = _time
+    val time: StateFlow<Long> = _time
 
     private var timerJob: Job? = null
 
@@ -35,6 +35,10 @@ class OperativeData(viewModelScope: CoroutineScope, oldTime: Int = 0) {
         timerJob?.cancel()
         timerJob = null
         _time.value = 0
+    }
+
+    fun setTime(newTime: Long) {
+        _time.value = newTime
     }
 
 }

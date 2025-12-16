@@ -11,7 +11,7 @@ import ua.ipze.kpi.part.database.project.ProjectDao
 
 @Database(
     entities = [Project::class, Layer::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
