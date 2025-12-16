@@ -31,11 +31,13 @@ abstract class IDrawingViewModel() : ViewModel() {
     abstract fun getLayers(): StateFlow<List<Layer>>
     abstract fun getCurrentActiveLayer(): StateFlow<CurrentActiveLayer?>
     abstract fun getCurrentActiveLayerIndex(): StateFlow<UInt>
+    abstract fun getRealPixelsPerDrawingPixel(): UInt
     abstract fun swapLayers(a: UInt, b: UInt)
     abstract fun setActiveLayer(index: UInt)
     abstract fun setVisibilityOfLayer(index: UInt, isVisible: Boolean)
     abstract fun setLockOnLayer(index: UInt, isLocked: Boolean)
     abstract fun setLayerName(index: UInt, name: String)
+
 
     // line drawing
     /**

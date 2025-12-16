@@ -1,5 +1,6 @@
 package ua.ipze.kpi.part.services.drawing
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
@@ -15,8 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
@@ -26,6 +30,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
+import androidx.core.graphics.createBitmap
 import ua.ipze.kpi.part.services.drawing.view.CachedBitmapImage
 import ua.ipze.kpi.part.services.drawing.view.IDrawingViewModel
 
@@ -69,13 +74,19 @@ fun DrawCanvas(
 
     val images = view.rememberImage()
     val scaling = remember { mutableFloatStateOf(1f) }
-    val lastBitmapPos = remember { mutableStateOf(Offset.Zero) }
+    val offset = remember { mutableStateOf(Offset.Zero) }
     var wasCentered by remember { mutableStateOf(false) }
     var canvasSize by remember { mutableStateOf(Size(1f, 1f)) }
 
     val firstOrNull = images.getOrNull(0)
     LaunchedEffect(firstOrNull?.image?.width, firstOrNull?.image?.height) {
         wasCentered = false
+    }
+
+    val realPixelsPerDrawingPixel = view.getRealPixelsPerDrawingPixel()
+    val chessBoardBitmap = remember(realPixelsPerDrawingPixel, firstOrNull?.image) {
+        val a = IntSize(firstOrNull?.image?.width ?: 1, firstOrNull?.image?.height ?: 1)
+        drawBackground(realPixelsPerDrawingPixel, a)
     }
 
 
@@ -86,7 +97,7 @@ fun DrawCanvas(
         modifier = modifier
             .clipToBounds()
             .pointerInput(Unit) {
-                drawAndPanPointerInput(lastBitmapPos, scaling, anyImage, canvasSize, handleDrawLine)
+                drawAndPanPointerInput(offset, scaling, anyImage, canvasSize, handleDrawLine)
             }
             .onSizeChanged {
                 canvasSize = it.toSize()
@@ -104,35 +115,96 @@ fun DrawCanvas(
 
                 val scaledWidth = anyImage.width * scaling.floatValue
                 val scaledHeight = anyImage.height * scaling.floatValue
-                lastBitmapPos.value = Offset(
+                offset.value = Offset(
                     x = (it.width - scaledWidth) / 2f,
                     y = (it.height - scaledHeight) / 2f
                 )
             }
     ) {
+        val drawBitmapImage = { image: ImageBitmap ->
+            drawImage(
+                image = image,
+                srcOffset = IntOffset.Zero,
+                srcSize = IntSize(
+                    image.width,
+                    image.height
+                ),
+                dstOffset = IntOffset(
+                    offset.value.x.toInt(),
+                    offset.value.y.toInt()
+                ),
+                dstSize = IntSize(
+                    (anyImage.width * scaling.floatValue).toInt(),
+                    (anyImage.height * scaling.floatValue).toInt()
+                ),
+                filterQuality = FilterQuality.None
+            )
+        }
+
+        drawBitmapImage(chessBoardBitmap.asImageBitmap())
         images.asReversed().forEach {
-            if (it.isVisible) {
-                drawImage(
-                    image = it.image,
-                    srcOffset = IntOffset.Zero,
-                    srcSize = IntSize(
-                        anyImage.width,
-                        anyImage.height
-                    ),
-                    dstOffset = IntOffset(
-                        lastBitmapPos.value.x.toInt(),
-                        lastBitmapPos.value.y.toInt()
-                    ),
-                    dstSize = IntSize(
-                        (anyImage.width * scaling.floatValue).toInt(),
-                        (anyImage.height * scaling.floatValue).toInt()
-                    ),
-                    filterQuality = FilterQuality.None
-                )
-            }
+            if (it.isVisible) drawBitmapImage(it.image)
         }
     }
 }
+
+private fun drawBackground(
+    realPixelsPerDrawingPixel: UInt = 0u,
+    backgroundPixelAmount: IntSize,
+): Bitmap {
+    val result = createBitmap(backgroundPixelAmount.width, backgroundPixelAmount.height)
+    val drawer = android.graphics.Canvas(result)
+
+    val realPixelAmount = realPixelsPerDrawingPixel.coerceAtLeast(1u).toInt()
+    val cellsPerRow = backgroundPixelAmount.width / realPixelAmount
+    val cellsPerColumn = backgroundPixelAmount.width / realPixelAmount
+
+    // Chessboard pattern
+    val grayPaint = android.graphics.Paint().also {
+        it.color = Color(0xFF9E9E9E).toArgb()
+    }
+    val whitePaint = android.graphics.Paint().also {
+        it.color = Color(0xFFBDBDBD).toArgb()
+    }
+
+    for (row in 0 until cellsPerColumn) {
+        for (col in 0 until cellsPerRow) {
+            val isGray = (row + col) % 2 == 0
+            val rectangle = android.graphics.Rect(
+                row * realPixelAmount,
+                col * realPixelAmount,
+                (row + 1) * realPixelAmount,
+                (col + 1) * realPixelAmount
+            )
+            drawer.drawRect(
+                rectangle,
+                if (isGray) grayPaint else whitePaint
+            )
+        }
+    }
+
+    return result
+}
+
+// Draw grid
+//    for (i in 0..cellsPerRow) {
+//        drawLine(
+//            color = Color(0xFF757575),
+//            start = offset + Offset(i * pixelSize, 0f),
+//            end = offset + Offset(i * pixelSize, size.height),
+//            strokeWidth = 3f
+//        )
+//    }
+//
+//    for (i in 0..cellsPerColumn) {
+//        drawLine(
+//            color = Color(0xFF757575),
+//            start = offset + Offset(0f, i * pixelSize),
+//            end = offset + Offset(size.width, i * pixelSize),
+//            strokeWidth = 3f
+//        )
+//    }
+
 
 suspend fun PointerInputScope.drawAndPanPointerInput(
     canvasOffset: MutableState<Offset>,
@@ -260,44 +332,3 @@ suspend fun PointerInputScope.drawAndPanPointerInput(
 }
 
 
-//        val cellWidth = size.width / cellsPerRow
-//        val cellHeight = size.height / cellsPerColumn
-//
-//        // Draw grid
-//        for (i in 0..cellsPerRow) {
-//            drawLine(
-//                color = Color(0xFF757575),
-//                start = Offset(i * cellWidth, 0f),
-//                end = Offset(i * cellWidth, size.height),
-//                strokeWidth = 1f
-//            )
-//        }
-//
-//        for (i in 0..cellsPerColumn) {
-//            drawLine(
-//                color = Color(0xFF757575),
-//                start = Offset(0f, i * cellHeight),
-//                end = Offset(size.width, i * cellHeight),
-//                strokeWidth = 1f
-//            )
-//        }
-//
-//        // Draw some example pixels (checkerboard pattern)
-//        for (row in 0 until cellsPerColumn) {
-//            for (col in 0 until cellsPerRow) {
-//                val isGray = (row + col) % 2 == 0
-//                if (isGray) {
-//                    drawRect(
-//                        color = Color(0xFF9E9E9E),
-//                        topLeft = Offset(col * cellWidth, row * cellHeight),
-//                        size = Size(cellWidth, cellHeight)
-//                    )
-//                } else {
-//                    drawRect(
-//                        color = Color(0xFFBDBDBD),
-//                        topLeft = Offset(col * cellWidth, row * cellHeight),
-//                        size = Size(cellWidth, cellHeight)
-//                    )
-//                }
-//            }
-//        }

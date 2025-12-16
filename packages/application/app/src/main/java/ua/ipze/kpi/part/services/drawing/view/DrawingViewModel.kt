@@ -164,6 +164,7 @@ class DrawingViewModel() : IDrawingViewModel() {
     // ----------------------------------------------------
     override fun getLayers(): StateFlow<List<Layer>> = layers.asStateFlow()
     override fun getCurrentActiveLayerIndex(): StateFlow<UInt> = activeLayerIndex.asStateFlow()
+    override fun getRealPixelsPerDrawingPixel(): UInt = realPixelsPerDrawPixel
 
     override fun getCurrentActiveLayer(): MutableStateFlow<CurrentActiveLayer?> = activeLayer
 
