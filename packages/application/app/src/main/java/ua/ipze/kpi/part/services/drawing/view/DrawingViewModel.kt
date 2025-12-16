@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import ua.ipze.kpi.part.database.layer.Layer
+import ua.ipze.kpi.part.database.project.PaletteList
 import ua.ipze.kpi.part.database.project.Project
 import ua.ipze.kpi.part.views.DatabaseProjectWithLayers
 import ua.ipze.kpi.part.views.DatabaseViewModel
@@ -47,11 +48,6 @@ class DrawingViewModel() : IDrawingViewModel() {
     private val ready = AtomicBoolean(false)
 
     private val cleanupScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
-    init {
-        Log.d("ViewModelScope", "ViewModel CREATED - HashCode: ${this.hashCode()}")
-        Log.d("ViewModelScope", "ViewModel instance: $this")
-    }
 
     override fun initialize(
         historyLength: UInt,
@@ -190,7 +186,9 @@ class DrawingViewModel() : IDrawingViewModel() {
     private lateinit var operativeData: OperativeData
     private lateinit var databaseView: DatabaseViewModel
 
-    private val layers = MutableStateFlow<List<Layer>>(listOf())
+    private val palette = MutableStateFlow<PaletteList>(PaletteList(emptyList()))
+
+    private val layers = MutableStateFlow<List<Layer>>(emptyList())
     private val activeLayerIndex = MutableStateFlow<UInt>(0u)
 
     private val activeLayer = MutableStateFlow<CurrentActiveLayer?>(null)
@@ -292,14 +290,19 @@ class DrawingViewModel() : IDrawingViewModel() {
             else layer
         }
     }
+
+    override fun getPalette(): StateFlow<PaletteList> = palette.asStateFlow()
+
+    override fun setPalette(colors: List<Color>) {
+        palette.value = PaletteList(colors.map { it.value.toLong() })
+    }
+
     // ----------------------------------------------------
 
     private suspend fun saveStep() {
-        Log.d(Tag, "Entered")
         if (!ready.get()) return
-        Log.d(Tag, "Passed ready")
         databaseView.saveProject(
-            project,
+            project.copy(palette = palette.value),
             layers.value.mapIndexed { index, layer ->
                 val bitmap = bitmaps[index]
                 val stream = ByteArrayOutputStream()
