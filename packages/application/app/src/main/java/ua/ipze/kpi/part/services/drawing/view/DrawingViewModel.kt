@@ -176,7 +176,7 @@ class DrawingViewModel() : IDrawingViewModel() {
                     project.height * realPixelsPerDrawPixel.toInt()
                 )
             )
-            canvases.add(0, Canvas(bitmaps.last()))
+            canvases.add(0, Canvas(bitmaps.first()))
             return@update listOf(layer) + it
         }
         triggerRedraw()
@@ -222,6 +222,7 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     override fun setActiveLayer(index: UInt) {
         if (!ready.get()) return
+        Log.d(Tag, "active layer was changed to $index")
         activeLayerIndex.value = index
     }
 
@@ -318,6 +319,7 @@ class DrawingViewModel() : IDrawingViewModel() {
                         "(index: ${activeLayerIndex.value}) is out of bounds of array of canvases"
             )
         }
+        Log.d(Tag, "Drawing line with active layer: ${activeLayerIndex.value}")
 
         val startScaled = Offset(
             start.x / this.realPixelsPerDrawPixel.toInt(),
