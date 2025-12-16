@@ -85,8 +85,9 @@ fun DrawCanvas(
 
     val realPixelsPerDrawingPixel = view.getRealPixelsPerDrawingPixel()
     val chessBoardBitmap = remember(realPixelsPerDrawingPixel, firstOrNull?.image) {
-        val a = IntSize(firstOrNull?.image?.width ?: 1, firstOrNull?.image?.height ?: 1)
-        drawBackground(realPixelsPerDrawingPixel, a)
+        val backgroundSize =
+            IntSize(firstOrNull?.image?.width ?: 1, firstOrNull?.image?.height ?: 1)
+        drawBackground(realPixelsPerDrawingPixel, backgroundSize)
     }
 
 
