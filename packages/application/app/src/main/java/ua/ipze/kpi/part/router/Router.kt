@@ -54,7 +54,7 @@ fun AppRouter(
 //                historyLength = 1,
 //                id = 0
 //            ),
-            startDestination = GalleryPageData,
+            startDestination = LoginPageData,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
