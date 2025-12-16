@@ -14,6 +14,7 @@ import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.database.project.LayersList
 import ua.ipze.kpi.part.database.project.Project
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.max
 
 val Tag = DatabaseViewModel::class.simpleName ?: ""
 
@@ -72,7 +73,11 @@ class DatabaseViewModel : ViewModel() {
                 Log.d(Tag, "Current time of insert (local: $localDateTime)")
 
 
-                val layerIds = layers.map { layer -> artDao.layerDao.upsertLayer(layer) }
+                val layerIds = layers.map { layer ->
+                    // upsert returns new id or -1 (if updated) - layer.id contains existing id or 0
+                    // (if new or first layer id db)
+                    max(artDao.layerDao.upsertLayer(layer), layer.id)
+                }
                 val projectNew = project.copy(
                     layers = LayersList(layersList = layerIds),
                     lastModified = epochTime
