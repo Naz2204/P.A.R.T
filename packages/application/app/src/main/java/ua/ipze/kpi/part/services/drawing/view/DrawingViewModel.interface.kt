@@ -26,11 +26,15 @@ abstract class IDrawingViewModel() : ViewModel() {
     )
 
     // data
+    abstract fun getWidthAmountPixels(): UInt
+    abstract fun getCurrentActiveLayerIndex(): StateFlow<UInt>
+    abstract fun getHeightAmountPixels(): UInt
+    abstract fun getOperativeData(): OperativeData
+
     abstract fun addLayer(layer: Layer)
     abstract fun deleteLayer(index: UInt)
     abstract fun getLayers(): StateFlow<List<Layer>>
     abstract fun getCurrentActiveLayer(): StateFlow<CurrentActiveLayer?>
-    abstract fun getCurrentActiveLayerIndex(): StateFlow<UInt>
     abstract fun getRealPixelsPerDrawingPixel(): UInt
     abstract fun swapLayers(a: UInt, b: UInt)
     abstract fun setActiveLayer(index: UInt)
@@ -67,16 +71,6 @@ abstract class IDrawingViewModel() : ViewModel() {
 
     // clear image
     abstract fun clearImage()
-
-    // work with files
-    abstract fun load(index: UInt, png: ByteArray): Result<Unit>
-    abstract fun storeToPng(index: UInt): ByteArray
-
-    abstract fun getWidthAmountPixels(): UInt
-
-    abstract fun getHeightAmountPixels(): UInt
-
-    abstract fun getOperativeData(): OperativeData
 
     // internal DON'T USE
     @Suppress("FunctionName")

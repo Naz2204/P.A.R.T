@@ -5,6 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import ua.ipze.kpi.part.database.ArtDatabase
 import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.database.project.LayersList
@@ -60,10 +64,23 @@ class DatabaseViewModel : ViewModel() {
     suspend fun saveProject(project: Project, layers: List<Layer>): Long? {
         return try {
             artDao.withTransaction {
+                val now = Clock.System.now()
+                val localDateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
+                val epochTime = localDateTime.toInstant(TimeZone.currentSystemDefault())
+                    .toEpochMilliseconds()
+
+                Log.d(Tag, "Current time of insert (local: $localDateTime)")
+
+
                 val layerIds = layers.map { layer -> artDao.layerDao.upsertLayer(layer) }
-                Log.d("db_test", "Created ${layerIds}")
-                val _project = project.copy(layers = LayersList(layersList = layerIds))
-                artDao.projectDao.upsertProject(_project)
+                val projectNew = project.copy(
+                    layers = LayersList(layersList = layerIds),
+                    lastModified = epochTime
+                )
+                Log.d(Tag, "Prepared project to insert")
+                val a = artDao.projectDao.upsertProject(projectNew)
+                Log.d(Tag, "ario")
+                a
             }
         } catch (_: Throwable) {
             null

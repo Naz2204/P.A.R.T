@@ -103,10 +103,7 @@ fun DrawCanvas(
             .onSizeChanged {
                 canvasSize = it.toSize()
                 if (wasCentered) return@onSizeChanged
-                Log.d("aaa", "1111assdfsdfsdf $wasCentered")
-
                 wasCentered = true // correct code, ignore linter
-                Log.d("aaa", "assdfsdfsdf $wasCentered")
 
                 val scaleX = it.width.toFloat() / anyImage.width
                 val scaleY = it.height.toFloat() / anyImage.height

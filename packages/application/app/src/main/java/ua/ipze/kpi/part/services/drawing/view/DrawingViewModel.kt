@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.get
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +28,8 @@ import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.database.project.Project
 import ua.ipze.kpi.part.views.DatabaseProjectWithLayers
 import ua.ipze.kpi.part.views.DatabaseViewModel
+import java.io.ByteArrayOutputStream
+import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 
 private val Tag = DrawingViewModel::class.simpleName ?: ""
@@ -54,7 +57,7 @@ class DrawingViewModel() : IDrawingViewModel() {
         this.historyLength = historyLength
         amountOfSteps = MutableStateFlow(DrawingAmountOfSteps(0u, 0u))
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val data = databaseViewModel.getProjectWithLayers(id)
             if (data == null) {
                 closePageOnFailure()
@@ -102,6 +105,18 @@ class DrawingViewModel() : IDrawingViewModel() {
                 else CurrentActiveLayer(layer = layer, indexInArray = index)
             }.collect({ activeLayer.value = it })
         }
+
+        startAutoSaves(Duration.ofMinutes(1))
+    }
+
+    override fun onCleared() {
+        Log.d("aaa", "mew")
+        // Run final save
+        viewModelScope.launch {
+            saveStep()
+        }
+
+        super.onCleared()
     }
 
     private fun getBitmap(
@@ -140,6 +155,12 @@ class DrawingViewModel() : IDrawingViewModel() {
         }
 
         return decodedBitmap
+    }
+
+    private fun startAutoSaves(interval: Duration) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+        }
     }
 
     // ----------------------------------------------------
@@ -260,10 +281,19 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
     // ----------------------------------------------------
 
-    private fun safeStep() {
+    private fun saveStep() {
         if (!ready.get()) return
-
-
+        viewModelScope.launch(Dispatchers.IO) {
+            databaseView.saveProject(
+                project,
+                layers.value.mapIndexed { index, layer ->
+                    val bitmap = bitmaps[index]
+                    val stream = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    layer.copy(imageData = stream.toByteArray())
+                }.toList()
+            )
+        }
     }
 
     private fun triggerRedraw() {
@@ -489,14 +519,6 @@ class DrawingViewModel() : IDrawingViewModel() {
     }
 
     // ----------------------------------------------------
-
-    override fun load(index: UInt, png: ByteArray): Result<Unit> {
-        TODO("Not yet implemented")
-    }
-
-    override fun storeToPng(index: UInt): ByteArray {
-        TODO("Not yet implemented")
-    }
 
 
     override fun getWidthAmountPixels(): UInt {

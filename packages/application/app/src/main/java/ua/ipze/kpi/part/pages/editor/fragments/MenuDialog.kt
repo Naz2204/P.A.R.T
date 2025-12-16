@@ -106,8 +106,10 @@ fun MenuDialog(onDismiss: () -> Unit) {
                     modifier = Modifier
 //                        .fillMaxWidth()
                         .clickable {
-                            TODO("Додати збереження перед переходом до галереї")
-                            data.nav.navigate(GalleryPageData)
+                            val currentDestination = data.nav.currentBackStackEntry?.destination
+                            data.nav.navigate(GalleryPageData) {
+                                popUpTo(currentDestination?.id ?: 0) { inclusive = true }
+                            }
                         }
                         .topBottomBorder(
                             strokeWidth = 4.dp,
@@ -159,7 +161,6 @@ fun MenuDialog(onDismiss: () -> Unit) {
                 Column(
                     modifier = Modifier
                         .clickable {
-                            TODO("Додати збереження перед виходом")
                             activity.activity.finish()
                         }
                         .topBottomBorder(

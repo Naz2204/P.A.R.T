@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -90,7 +91,7 @@ fun AppRouter(
             composable<GalleryPageData> { GalleryPage(passwordViewModel) }
             composable<EditorPageData> {
                 val data = it.toRoute<EditorPageData>()
-                val drawingViewModel = DrawingViewModel()
+                val drawingViewModel: DrawingViewModel = viewModel(it)
                 drawingViewModel.initialize(
                     data.historyLength.toUInt(),
                     4.toUInt(),
