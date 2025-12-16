@@ -1,5 +1,6 @@
 package ua.ipze.kpi.part.pages.gallery
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -204,6 +205,7 @@ fun GalleryPage(passwordViewModel: PasswordViewModel) {
                         item = item,
                         onDeleteClick = { id ->
                             scope.launch {
+                                Log.e("inScope", "Entered delete scope")
                                 data.databaseViewModel.deleteProject(id)
                             }
                         },

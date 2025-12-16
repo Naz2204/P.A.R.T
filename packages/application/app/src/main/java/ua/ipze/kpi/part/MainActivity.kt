@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
 import ua.ipze.kpi.part.database.ArtDatabase
+import ua.ipze.kpi.part.database.migration_4_5
 import ua.ipze.kpi.part.providers.MainActivityData
 import ua.ipze.kpi.part.providers.MainActivityDataProvider
 import ua.ipze.kpi.part.router.AppRouter
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
             applicationContext,
             ArtDatabase::class.java,
             "art.db"
-        ).fallbackToDestructiveMigration().build() // FIXME: remove
+        ).addMigrations(migration_4_5).fallbackToDestructiveMigration().build()
     }
 
     private val promptManager by lazy {
