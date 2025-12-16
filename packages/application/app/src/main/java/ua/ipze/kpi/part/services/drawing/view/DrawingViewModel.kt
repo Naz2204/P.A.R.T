@@ -169,8 +169,13 @@ class DrawingViewModel() : IDrawingViewModel() {
         if (!ready.get()) return
 
         layers.update {
-            bitmaps.add(createBitmap(project.width, project.height))
-            canvases.addLast(Canvas(bitmaps.last()))
+            bitmaps.add(
+                createBitmap(
+                    project.width * realPixelsPerDrawPixel.toInt(),
+                    project.height * realPixelsPerDrawPixel.toInt()
+                )
+            )
+            canvases.add(Canvas(bitmaps.last()))
             return@update listOf(layer) + it
         }
         triggerRedraw()
