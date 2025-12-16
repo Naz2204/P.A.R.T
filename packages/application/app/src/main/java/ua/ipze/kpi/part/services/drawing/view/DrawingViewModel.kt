@@ -98,6 +98,7 @@ class DrawingViewModel() : IDrawingViewModel() {
             triggerRedraw()
 
 
+            palette.value = data.project.palette.paletteList.map { Color(it.toULong()) }
             layers.value = data.layers
             activeLayerIndex.value = 0u
 
