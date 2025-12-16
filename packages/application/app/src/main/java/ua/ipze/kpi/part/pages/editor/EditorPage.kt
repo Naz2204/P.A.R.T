@@ -62,7 +62,13 @@ fun EditorPage(drawingViewModel: IDrawingViewModel, id: Long) {
     var showLayers by remember { mutableStateOf(false) }
     var layerHidden by remember { mutableStateOf(false) }
     var selectedTool by remember { mutableIntStateOf(3) }
-    var selectedColor by remember { mutableStateOf(Color(0xFFFFEB3B)) }
+    var selectedColor by remember {
+        mutableStateOf(
+            Color(
+                projectData?.project?.palette?.paletteList[0] ?: 0xffffffff
+            )
+        )
+    }
     var colors by remember { mutableStateOf<List<Color>>(emptyList()) }
 
     LaunchedEffect(id) {

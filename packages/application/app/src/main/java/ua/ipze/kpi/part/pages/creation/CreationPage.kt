@@ -69,7 +69,7 @@ fun CreationPage() {
 
     val data = BasePageDataProvider.current
     val paletteViewModel: PaletteViewModel = viewModel()
-    
+
     val scrollStateV = rememberScrollState()
     val scrollStateH = rememberScrollState()
 
@@ -339,9 +339,9 @@ fun CreationPage() {
                     val epochTime = localDateTime.toInstant(TimeZone.currentSystemDefault())
                         .toEpochMilliseconds()
 
-                    val listLayer = List(numLayers.toIntOrNull() ?: 1) {
+                    val listLayer = List(numLayers.toIntOrNull() ?: 1) { index ->
                         Layer(
-                            name = "Layer",
+                            name = "Layer $index",
                             visibility = true,
                             lock = false,
                             imageData = ByteArray(0)

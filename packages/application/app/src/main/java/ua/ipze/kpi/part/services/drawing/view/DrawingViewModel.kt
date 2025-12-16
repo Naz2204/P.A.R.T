@@ -73,7 +73,7 @@ class DrawingViewModel() : IDrawingViewModel() {
                     pixelsPerPixelCell,
                     index == 0
                 )
-            }
+            }.reversed()
             if (bitmapResults.size != data.layers.size) {
                 closePageOnFailure()
                 return@launch
@@ -186,7 +186,7 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     override fun deleteLayer(index: UInt) {
         if (!ready.get()) return
-        if (index.toInt() <= bitmaps.size) return
+        if (index.toInt() >= bitmaps.size) return
 
         layers.update {
             bitmaps.removeAt(index.toInt())
