@@ -30,12 +30,13 @@ import ua.ipze.kpi.part.R
 import ua.ipze.kpi.part.providers.MainActivityDataProvider
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.router.GalleryPageData
-import ua.ipze.kpi.part.services.drawing.view.DrawingViewModel
+import ua.ipze.kpi.part.services.drawing.view.IDrawingViewModel
 import ua.ipze.kpi.part.ui.theme.topBottomBorder
+import ua.ipze.kpi.part.utils.filesystem.writePngToGallery
 import ua.ipze.kpi.part.views.localizedStringResource
 
 @Composable
-fun MenuDialog(drawingViewModel: DrawingViewModel, onDismiss: () -> Unit) {
+fun MenuDialog(drawingViewModel: IDrawingViewModel, onDismiss: () -> Unit) {
     val data = BasePageDataProvider.current
     val activity = MainActivityDataProvider.current
     var language by remember { mutableStateOf("en") }
@@ -86,7 +87,11 @@ fun MenuDialog(drawingViewModel: DrawingViewModel, onDismiss: () -> Unit) {
                     modifier = Modifier
 //                        .fillMaxWidth()
                         .clickable {
-                            TODO("Додати експорт зображення")
+                            writePngToGallery(
+                                drawingViewModel.getProjectName(),
+                                drawingViewModel.toPng()
+                            )
+                            onDismiss()
                         }
                         .topBottomBorder(
                             strokeWidth = 4.dp,
@@ -153,11 +158,12 @@ fun MenuDialog(drawingViewModel: DrawingViewModel, onDismiss: () -> Unit) {
                     modifier = Modifier
 //                        .fillMaxWidth()
                         .clickable {
-                            if (data.language.localeState.currentLocale.toLanguageTag() == "uk") {
-                                language = "en"
-                            } else {
-                                language = "uk"
-                            }
+                            language =
+                                if (data.language.localeState.currentLocale.toLanguageTag() == "uk") {
+                                    "en"
+                                } else {
+                                    "uk"
+                                }
                             data.language.setAppLanguage(language)
                         }
                         .topBottomBorder(

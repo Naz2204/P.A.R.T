@@ -207,6 +207,11 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     override fun getCurrentActiveLayer(): MutableStateFlow<CurrentActiveLayer?> = activeLayer
 
+    override fun getProjectName(): String {
+        if (!ready.value) return ""
+        return project.name
+    }
+
     override fun addLayer(layer: Layer) {
         if (!ready.value) return
 
@@ -306,7 +311,7 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     // ----------------------------------------------------
 
-    fun saveProject() {
+    override fun saveProject() {
         cleanupScope.launch {
             saveStep()
         }
@@ -565,8 +570,12 @@ class DrawingViewModel() : IDrawingViewModel() {
         )
         val canvas = Canvas(resultBitmap)
 
+
         bitmaps.reversed().forEach {
-            canvas.drawBitmap(it, 0f, 0f, null)
+            canvas.drawBitmap(it, 0f, 0f, Paint().apply {
+                isFilterBitmap = false
+                isAntiAlias = false
+            })
         }
 
         val stream = ByteArrayOutputStream()

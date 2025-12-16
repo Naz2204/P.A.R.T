@@ -23,6 +23,7 @@ import ua.ipze.kpi.part.database.ArtDatabase
 import ua.ipze.kpi.part.database.migration_4_5
 import ua.ipze.kpi.part.providers.MainActivityData
 import ua.ipze.kpi.part.providers.MainActivityDataProvider
+import ua.ipze.kpi.part.providers.static.GlobalApplicationContext
 import ua.ipze.kpi.part.router.AppRouter
 import ua.ipze.kpi.part.services.geogetter.LocationViewModel
 import ua.ipze.kpi.part.ui.theme.PARTTheme
@@ -59,13 +60,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val controller = WindowInsetsControllerCompat(window, window.decorView)
         controller.hide(WindowInsetsCompat.Type.systemBars())
         controller.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         enableEdgeToEdge()
+
+        GlobalApplicationContext.init(this)
+
         setContent {
             val languageViewModel: LanguageViewModel = viewModel()
             val passwordViewModel: PasswordViewModel = viewModel()

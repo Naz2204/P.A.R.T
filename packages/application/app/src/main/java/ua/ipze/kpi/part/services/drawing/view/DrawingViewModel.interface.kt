@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ua.ipze.kpi.part.database.layer.Layer
-import ua.ipze.kpi.part.database.project.PaletteList
 import ua.ipze.kpi.part.views.DatabaseViewModel
 
 data class DrawingAmountOfSteps(val backward: UInt, val forward: UInt)
@@ -49,6 +48,7 @@ abstract class IDrawingViewModel() : ViewModel() {
     abstract fun setLayerName(index: UInt, name: String)
     abstract fun getPalette(): StateFlow<List<Color>>
     abstract fun setPalette(colors: List<Color>)
+    abstract fun getProjectName(): String
 
     // line drawing
     /**
@@ -79,6 +79,7 @@ abstract class IDrawingViewModel() : ViewModel() {
     // clear image
     abstract fun clearImage()
 
+    abstract fun saveProject()
     abstract fun toPng(): ByteArray
 
     // internal DON'T USE
