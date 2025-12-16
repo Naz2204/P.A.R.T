@@ -47,11 +47,10 @@ import ua.ipze.kpi.part.router.EditorPageData
 import ua.ipze.kpi.part.router.GalleryPageData
 import ua.ipze.kpi.part.services.drawing.DrawCanvas
 import ua.ipze.kpi.part.services.drawing.view.DrawingViewModel
-import ua.ipze.kpi.part.views.DatabaseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorPage(editorPageData: EditorPageData, databaseViewModel: DatabaseViewModel) {
+fun EditorPage(editorPageData: EditorPageData) {
 
     val data = BasePageDataProvider.current
 
@@ -62,7 +61,7 @@ fun EditorPage(editorPageData: EditorPageData, databaseViewModel: DatabaseViewMo
             editorPageData.historyLength.toUInt(),
             4.toUInt(),
             editorPageData.id,
-            databaseViewModel
+            data.databaseViewModel
         ) {
             data.nav.navigate(GalleryPageData)
         }

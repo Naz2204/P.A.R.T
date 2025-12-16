@@ -89,14 +89,7 @@ fun AppRouter(
             composable<GalleryPageData> { GalleryPage(passwordViewModel) }
             composable<EditorPageData> {
                 val data = it.toRoute<EditorPageData>()
-//
-//                val localOwner = LocalViewModelStoreOwner.current
-//
-//                Log.d("ViewModelScope", "ViewModelStoreOwner: ${localOwner?.javaClass?.simpleName}")
-//                Log.d("ViewModelScope", "Owner hashCode: ${localOwner?.hashCode()}")
-
-
-                EditorPage(data, databaseViewModel)
+                EditorPage(data)
             }
         }
     }

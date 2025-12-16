@@ -69,8 +69,10 @@ class DrawingViewModel() : IDrawingViewModel() {
             databaseView = databaseViewModel
             val data = databaseView.getProjectWithLayers(id)
             if (data == null) {
-                closePageOnFailure()
                 Log.e(Tag, "Failed to get value from db for id: $id")
+                viewModelScope.launch(Dispatchers.Main) {
+                    closePageOnFailure()
+                }
                 return@launch
             }
             project = data.project
