@@ -6,7 +6,7 @@
     <string name="password">пароль</string>
     <string name="repeat">повторіть пароль</string>
     <string name="new_art">Новий піксель арт</string>
-    <string name="size">Розміри(ШхД)</string>
+    <string name="size">Розміри(ШхВ)</string>
     <string name="init_color_scheme">Початкова кольорова схема</string>
     <string name="init_layers_num">Початкова кількість шарів</string>
     <string name="name">Назва</string>
@@ -18,4 +18,15 @@
     <string name="projects">Проєкти</string>
     <string name="language">Мова</string>
     <string name="exit">Вийти</string>
+    <string name="or">або</string>
+    <string name="fingerprint_title">Розблокувати галерею</string>
+    <string name="fingerprint_description">Використайте відбиток пяльця, щоб розблокувати галерею</string>
+    <string name="change_key">змінити ключ</string>
+    <string name="drawings">рисунки</string>
+    <string name="app_themes">теми програми</string>
+    <string name="create">СТВОРИТИ</string>
+    <string name="color">Вибери колір</string>
+    <string name="add">Додати</string>
+    <string name="cancel">Скасувати</string>
+    <string name="save">Зберегти</string>
 </resources>

@@ -1,6 +1,5 @@
 package ua.ipze.kpi.part.router
 
-import android.content.Context
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -11,20 +10,51 @@ import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ua.ipze.kpi.part.pages.info.InfoPage
-import ua.ipze.kpi.part.pages.start.StartPage
+import androidx.navigation.toRoute
+import ua.ipze.kpi.part.pages.creation.CreationPage
+import ua.ipze.kpi.part.pages.editor.EditorPage
+import ua.ipze.kpi.part.pages.gallery.GalleryPage
+import ua.ipze.kpi.part.pages.login.LoginPage
+import ua.ipze.kpi.part.pages.login.PasswordCreationPage
 import ua.ipze.kpi.part.providers.basePageData.BasePageData
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
-import ua.ipze.kpi.part.providers.languageChange.LanguageViewModel
+import ua.ipze.kpi.part.services.geogetter.LocationViewModel
+import ua.ipze.kpi.part.utils.Biometry
+import ua.ipze.kpi.part.views.DatabaseViewModel
+import ua.ipze.kpi.part.views.LanguageViewModel
+import ua.ipze.kpi.part.views.PasswordViewModel
 
 @Composable
-fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel) {
+fun AppRouter(
+    innerPadding: PaddingValues,
+    languageViewModel: LanguageViewModel,
+    passwordViewModel: PasswordViewModel,
+    databaseViewModel: DatabaseViewModel,
+    promptManager: Biometry,
+    locationViewModel: LocationViewModel
+) {
     val navController = rememberNavController()
-    val basicPageData = remember { BasePageData(innerPadding, navController) }
+    val basicPageData =
+        remember {
+            BasePageData(
+                innerPadding,
+                navController,
+                languageViewModel,
+                databaseViewModel,
+                locationViewModel
+            )
+        }
 
     CompositionLocalProvider(BasePageDataProvider provides basicPageData) {
         NavHost(
-            navController = navController, startDestination = StartPageData,
+            navController = navController,
+//            startDestination = EditorPageData(
+//                drawingWidthPixels = 500,
+//                drawingHeightPixels = 500,
+//                historyLength = 1,
+//                id = 0
+//            ),
+            startDestination = GalleryPageData,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -48,9 +78,19 @@ fun AppRouter(innerPadding: PaddingValues, languageViewModel: LanguageViewModel)
                     towards = AnimatedContentTransitionScope.SlideDirection.Right,
                     animationSpec = tween(300, easing = FastOutSlowInEasing)
                 )
-            }) {
-            composable<StartPageData> { StartPage(languageViewModel = languageViewModel) }
-//            composable<InfoPageData> { InfoPage() }
+            }
+        ) {
+            composable<LoginPageData> {
+                if (passwordViewModel.passwordExists) LoginPage(passwordViewModel, promptManager)
+                else PasswordCreationPage(passwordViewModel)
+            }
+            //            composable<LoginPageData> { LoginPage(passwordViewModel, promptManager) }
+            composable<CreateArtPageData> { CreationPage() }
+            composable<GalleryPageData> { GalleryPage(passwordViewModel) }
+            composable<EditorPageData> {
+                val data = it.toRoute<EditorPageData>()
+                EditorPage(data)
+            }
         }
     }
 }

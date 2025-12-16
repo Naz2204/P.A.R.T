@@ -18,4 +18,16 @@
     <string name="projects">Projects</string>
     <string name="language">Language</string>
     <string name="exit">Exit</string>
+    <string name="or">or</string>
+    <string name="fingerprint_title">Unlock galery</string>
+    <string name="fingerprint_description">Use your fingerprint to unlock the galery</string>
+    <string name="change_key">change key</string>
+    <string name="drawings">drawings</string>
+    <string name="app_themes">app themes</string>
+    <string name="create">CREATE</string>
+    <string name="turtle" translatable="false">for real turtles</string>
+    <string name="color">Pick a Color</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 </resources>
