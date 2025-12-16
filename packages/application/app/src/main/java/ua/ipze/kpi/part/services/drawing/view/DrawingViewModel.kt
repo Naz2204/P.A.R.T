@@ -70,7 +70,8 @@ class DrawingViewModel() : IDrawingViewModel() {
                     index,
                     value.id,
                     data,
-                    pixelsPerPixelCell
+                    pixelsPerPixelCell,
+                    index == 0
                 )
             }
             if (bitmapResults.size != data.layers.size) {
@@ -108,6 +109,7 @@ class DrawingViewModel() : IDrawingViewModel() {
         id: Long,
         data: DatabaseProjectWithLayers,
         pixelsPerPixelCell: UInt,
+        isInitial: Boolean = false
     ): Bitmap? {
         if (data.layers[index].imageData.isEmpty()) {
             val newBitmap = createBitmap(
@@ -116,7 +118,7 @@ class DrawingViewModel() : IDrawingViewModel() {
             )
             Canvas(newBitmap).drawPaint(Paint().also {
                 it.color =
-                    if (index == 0) {
+                    if (isInitial) {
                         Color(data.project.baseColor.toULong()).toArgb()
                     } else {
                         Color.Transparent.toArgb()
@@ -246,10 +248,21 @@ class DrawingViewModel() : IDrawingViewModel() {
         }
     }
 
+    override fun setLayerName(index: UInt, name: String) {
+        if (!ready.get()) return
 
+        val i = index.toInt()
+        layers.value = layers.value.mapIndexed { idx, layer ->
+            if (idx == i) layer.copy(name = name)
+            else layer
+        }
+    }
     // ----------------------------------------------------
 
     private fun safeStep() {
+        if (!ready.get()) return
+
+
     }
 
     private fun triggerRedraw() {

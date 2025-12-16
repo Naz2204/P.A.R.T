@@ -35,7 +35,7 @@ abstract class IDrawingViewModel() : ViewModel() {
     abstract fun setActiveLayer(index: UInt)
     abstract fun setVisibilityOfLayer(index: UInt, isVisible: Boolean)
     abstract fun setLockOnLayer(index: UInt, isLocked: Boolean)
-
+    abstract fun setLayerName(index: UInt, name: String)
 
     // line drawing
     /**

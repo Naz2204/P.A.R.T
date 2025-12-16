@@ -50,12 +50,13 @@ fun DropdownSelector(
             horizontalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Text(
-                text = items[selected].value.toLong().toHexString(HexFormat {
+                text = items[selected].value.toHexString(HexFormat {
                     upperCase = false
                     number.prefix = "#"
                     number.minLength = 8
                     number.removeLeadingZeros = true
-                }), Modifier
+                }).slice(0..8),
+                Modifier
                     .background(color = items[selected])
                     .weight(0.5f),
                 fontSize = 20.sp, textAlign = TextAlign.Center, color = Color(0xff000000)
@@ -78,12 +79,12 @@ fun DropdownSelector(
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = item.value.toLong().toHexString(HexFormat {
+                            text = item.value.toHexString(HexFormat {
                                 upperCase = false
                                 number.prefix = "#"
                                 number.minLength = 8
                                 number.removeLeadingZeros = true
-                            }), textAlign = TextAlign.Center,
+                            }).slice(0..8), textAlign = TextAlign.Center,
                             fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.pixel_font_7)),
                             modifier = Modifier.fillMaxWidth(),

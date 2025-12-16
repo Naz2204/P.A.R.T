@@ -15,11 +15,12 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,12 +28,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ua.ipze.kpi.part.R
 import ua.ipze.kpi.part.database.layer.Layer
 import ua.ipze.kpi.part.providers.basePageData.BasePageDataProvider
 import ua.ipze.kpi.part.services.drawing.view.DrawingViewModel
+import ua.ipze.kpi.part.ui.theme.pixelBorder
 
 @Composable
 fun LayersPanel(
@@ -41,6 +44,7 @@ fun LayersPanel(
 ) {
     val data = BasePageDataProvider.current
 
+    val scrollStateH = rememberScrollState()
     val lazyListState = rememberLazyListState()
 
     val layers by drawingViewModel.getLayers().collectAsState()
@@ -91,6 +95,7 @@ fun LayersPanel(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f, fill = false)
+                        .height(300.dp)
                 ) {
                     itemsIndexed(
                         items = layers
@@ -111,7 +116,6 @@ fun LayersPanel(
                                 }),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
                             IconButton(onClick = {
                                 drawingViewModel.setVisibilityOfLayer(
                                     index.toUInt(),
@@ -126,11 +130,19 @@ fun LayersPanel(
                                 )
                             }
 
-                            Text(
-                                text = "Layer ${layers[index].id}",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                modifier = Modifier.weight(1f)
+                            BasicTextField(
+                                value = layers[index].name,
+                                onValueChange = { it ->
+                                    drawingViewModel.setLayerName(
+                                        index.toUInt(),
+                                        it
+                                    )
+                                },
+                                textStyle = TextStyle(color = Color.White, fontSize = 16.sp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .pixelBorder(borderWidth = 1.5.dp),
+                                enabled = index.toUInt() == activeIndex
                             )
 
                             IconButton(onClick = {

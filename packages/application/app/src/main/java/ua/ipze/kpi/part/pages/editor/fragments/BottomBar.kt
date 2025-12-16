@@ -48,7 +48,7 @@ fun BottomBar(
                 .padding(horizontal = 10.dp, vertical = 0.dp)
         ) {
             Text(
-                text = "Layer ${activeLayer.value?.layer?.id}",
+                text = activeLayer.value?.layer?.name ?: "",
                 color = Color.White,
                 fontSize = 14.sp,
                 modifier = Modifier

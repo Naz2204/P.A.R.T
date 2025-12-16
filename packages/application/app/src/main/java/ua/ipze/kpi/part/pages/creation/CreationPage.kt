@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -62,42 +61,32 @@ import ua.ipze.kpi.part.services.qrWorker.jsonToColors
 import ua.ipze.kpi.part.ui.theme.pixelBorder
 import ua.ipze.kpi.part.ui.theme.topBottomBorder
 import ua.ipze.kpi.part.views.localizedStringResource
-import ua.ipze.kpi.part.widgets.inputs.DropdownSelector
+import ua.ipze.kpi.part.widgets.ColorPickerDialog
 
+@OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun CreationPage() {
 
     val data = BasePageDataProvider.current
     val paletteViewModel: PaletteViewModel = viewModel()
-
-    //TODO можливо замінити випадаюче меню на меню вибору кольору
-    val possibleBackgrounds: List<Color> = listOf(
-        Color(0xffffffff),
-        Color(0xffff0000),
-        Color(0xff00ff00),
-        Color(0xff0000ff)
-    )
-
+    
     val scrollStateV = rememberScrollState()
     val scrollStateH = rememberScrollState()
 
-    var name by remember { mutableStateOf("") }
-    var width by remember { mutableStateOf("") }
-    var height by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("New project") }
+    var width by remember { mutableStateOf("25") }
+    var height by remember { mutableStateOf("25") }
     var numLayers by remember { mutableStateOf("1") }
     var colorScheme by remember {
         mutableStateOf<List<List<Int>>>(
             listOf(
-                listOf(255, 255, 255),
-                listOf(255, 255, 255),
-                listOf(255, 255, 255),
-                listOf(255, 255, 255),
                 listOf(255, 255, 255)
             )
         )
     }
-    var selectedBg by remember { mutableIntStateOf(0) }
+    var selectedBg by remember { mutableStateOf<Color>(Color(0xffffffff)) }
     var showQrDialog by remember { mutableStateOf(false) }
+    var showColorPicker by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -105,6 +94,16 @@ fun CreationPage() {
         QRDialog(colorScheme) {
             showQrDialog = false
         }
+    }
+
+    if (showColorPicker) {
+        ColorPickerDialog(
+            onDismiss = { showColorPicker = false },
+            onColorSelected = { color ->
+                selectedBg = color
+                showColorPicker = false
+            }
+        )
     }
 
     Column(
@@ -298,8 +297,7 @@ fun CreationPage() {
                 color = Color(0xffffffff),
                 modifier = Modifier.padding(start = 4.dp)
             )
-            DropdownSelector(
-                possibleBackgrounds, selectedBg, { selectedBg = it },
+            Box(
                 modifier = Modifier
                     .pixelBorder(
                         backgroundColor = Color(0xff53565A),
@@ -307,7 +305,24 @@ fun CreationPage() {
                     )
                     .padding(4.dp)
                     .fillMaxWidth()
-            )
+                    .clickable(onClick = {
+                        showColorPicker = true
+                    })
+            ) {
+                Text(
+                    text = selectedBg.value.toHexString(HexFormat {
+                        upperCase = false
+                        number.prefix = "#"
+                        number.minLength = 8
+                        number.removeLeadingZeros = true
+                    }).slice(0..8),
+                    modifier = Modifier
+                        .background(color = selectedBg)
+                        .fillMaxWidth()
+                        .padding(horizontal = 6.dp),
+                    fontSize = 20.sp, textAlign = TextAlign.Center, color = Color(0xff000000)
+                )
+            }
         }
 
         val city by data.locationViewModel.city.collectAsState()
@@ -326,7 +341,7 @@ fun CreationPage() {
 
                     val listLayer = List(numLayers.toIntOrNull() ?: 1) {
                         Layer(
-                            name = "",
+                            name = "Layer",
                             visibility = true,
                             lock = false,
                             imageData = ByteArray(0)
@@ -338,14 +353,13 @@ fun CreationPage() {
                         width = width.toIntOrNull() ?: 1,
                         height = height.toIntOrNull() ?: 1,
                         name = name,
-                        //TODO додати геолокацію
                         lastSettlement = city.toString(),
                         palette = PaletteList(colorScheme.map {
                             Color(it[0], it[1], it[2]).value.toLong()
                         }),
                         timer = 0,
                         lastModified = epochTime,
-                        baseColor = possibleBackgrounds[selectedBg].value.toLong()
+                        baseColor = selectedBg.value.toLong()
                     )
                     Log.d("db_test", "Palette ${project.palette}")
 
