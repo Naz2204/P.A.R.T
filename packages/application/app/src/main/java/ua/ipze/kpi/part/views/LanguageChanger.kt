@@ -3,8 +3,6 @@ package ua.ipze.kpi.part.views
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
-import android.os.LocaleList
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,7 +12,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ua.ipze.kpi.part.utils.PrefManager
@@ -62,9 +59,7 @@ class LanguageViewModel(application: Application) : AndroidViewModel(application
 fun getLocalizedContext(context: Context, locale: Locale): Context {
     val config = Configuration(context.resources.configuration)
     config.setLocale(locale)
-    val localeList = LocaleList(locale)
-    config.setLocales(localeList)
-    return  context.createConfigurationContext(config)
+    return context.createConfigurationContext(config)
 }
 
 @Composable
