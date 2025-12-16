@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 class LocationViewModel(application: Application) : AndroidViewModel(application) {
     private val locationManager = LocationManager(application)
 
-    private val _city = MutableStateFlow<String?>(null)
-    val city: StateFlow<String?> = _city.asStateFlow()
+    private val _location = MutableStateFlow<String?>(null)
+    val location: StateFlow<String?> = _location.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -22,7 +22,7 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
             _isLoading.value = true
 
             locationManager.getLocation { result ->
-                _city.value = result
+                _location.value = result
                 _isLoading.value = false
             }
         }
