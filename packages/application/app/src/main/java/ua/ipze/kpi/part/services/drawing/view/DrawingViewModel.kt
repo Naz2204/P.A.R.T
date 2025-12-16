@@ -222,7 +222,6 @@ class DrawingViewModel() : IDrawingViewModel() {
 
     override fun setActiveLayer(index: UInt) {
         if (!ready.get()) return
-        Log.d(Tag, "active layer was changed to $index")
         activeLayerIndex.value = index
     }
 
@@ -313,13 +312,14 @@ class DrawingViewModel() : IDrawingViewModel() {
     override fun drawLine(start: Offset, end: Offset, color: Color) {
         if (!ready.get()) return
         if (activeLayerIndex.value.toInt() >= canvases.size) {
-            Log.i(
+            Log.e(
                 Tag,
                 "Skipping drawing line, because queried canvas " +
                         "(index: ${activeLayerIndex.value}) is out of bounds of array of canvases"
             )
         }
-        Log.d(Tag, "Drawing line with active layer: ${activeLayerIndex.value}")
+        if (layers.value[activeLayerIndex.value.toInt()].lock) return
+
 
         val startScaled = Offset(
             start.x / this.realPixelsPerDrawPixel.toInt(),
